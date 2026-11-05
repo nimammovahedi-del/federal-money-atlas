@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Round Two Iterations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../rebuild/base.css">
+<link rel="stylesheet" href="v2.css">
+<style>
+.screen{position:relative;border:1px solid var(--ink);background:var(--white);aspect-ratio:4/3;overflow:hidden;margin-top:18px}
+.screen iframe{position:absolute;top:0;left:0;width:1280px;height:960px;border:0;transform-origin:0 0;pointer-events:none}
+.screen a{position:absolute;inset:0}
+.tabs{display:flex;flex-wrap:wrap;margin-top:12px;border:1px solid var(--ink);width:max-content;max-width:100%}
+.tabs button{border:0;background:transparent;padding:0 12px;height:34px;font:600 11px var(--sans);letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.open{display:inline-block;margin-top:16px;font:700 15px var(--sans);text-decoration:none;border-bottom:2px solid var(--ink)}
+.done{list-style:none;margin:0;padding:0;columns:2;column-gap:32px}
+.done li{break-inside:avoid;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.done li b{display:block}
+@media (max-width:760px){.done{columns:1}}
+</style>
+</head>
+<body data-style="pixel">
+<header class="top"><span class="brand"><i aria-hidden="true"><b></b><b></b><b></b><b></b></i>Federal Money Atlas · Round 2</span>
+  <nav class="main" aria-label="Iterations"><a href="pixel.html">Pixel</a><a href="lines.html">Lines</a><a href="type.html">Type</a><a href="../rebuild/index.html">Round 1</a></nav></header>
+<main id="main">
+  <div class="grid">
+    <div class="cell s8 white"><p class="label">Round 2 · prototype · not published</p><h1 class="hero">Same site, three patterns.</h1>
+      <p class="lead">All three follow your new brief: A's front page, a separate full-screen map with a slide-out options panel, Option B's list and compare pages with state/county dropdowns and a pick-on-a-map panel, and more of nader.io's grid, green and pattern. They differ only in the pattern that fills the empty tiles.</p></div>
+    <div class="cell s4 green"><div class="stack"><p class="label" style="color:var(--ink)">Pick one</p><p class="giant">1 of 3</p></div></div>
+  </div>
+  <div class="grid" id="its"></div>
+  <div class="grid"><div class="cell s12 white"><h2 class="label" style="margin-bottom:12px">What changed from round 1</h2><ul class="done">
+    <li><b>Front page</b>“What does $1 get you?”, search, then “Show the map” and “Browse counties”; the typical county in green on the right; pattern and “how it works” tiles fill the rest.</li>
+    <li><b>Map page</b>Full screen. The key sits above the map. Options slide in from the left (open on desktop, closed on phones): 1 kind of money, 2 population and dollars-back range sliders, 3 Land / People / Grid.</li>
+    <li><b>Result card always in view</b>Top-right of the map, with a large green “Open county →” button.</li>
+    <li><b>List</b>Option B rows with name, state, size, money type and sort filters (saved in the link).</li>
+    <li><b>Compare</b>Option B rows with bars, plus state → county dropdowns, search, and a slide-out map where you click counties to add them.</li>
+    <li><b>More nader.io</b>Hairline grid everywhere, more green blocks, numbered steps, and pattern tiles in empty spaces.</li>
+  </ul></div></div>
+  <p class="foot">Real Phase 0 data (fiscal year 2023). Checked on desktop and at phone width (375px): no sideways scrolling on any page.</p>
+</main>
+<script>
+const ITS = [["pixel.html", "Pixel", "nader.io's own signature: green and black pixel blocks with fine line textures."],
+  ["lines.html", "Lines", "Barcode stripes and hatching bands; calmer, more technical."],
+  ["type.html", "Type", "Giant $, ¢, % and arrows as filler tiles; the boldest and most playful."]];
+const PAGES = [["", "Home"], ["#/map", "Map"], ["#/county/39049", "County"], ["#/list", "List"], ["#/compare?pins=39049,13053,06081", "Compare"]];
+document.getElementById("its").innerHTML = ITS.map(([f, n, d], i) => `<div class="cell s4 ${i === 0 ? "white" : ""}"><p class="label">Iteration ${i + 1}</p><h2 class="t" style="font:800 28px/1.05 var(--sans);letter-spacing:-.03em">${n}</h2><p class="small" style="margin-top:8px">${d}</p>
+  <div class="tabs" role="group" aria-label="Preview page for ${n}">${PAGES.map(([h, l], k) => `<button aria-pressed="${k === 0}" data-f="${f}" data-h="${h}">${l}</button>`).join("")}</div>
+  <div class="screen"><iframe title="${n} preview" src="${f}" tabindex="-1"></iframe><a href="${f}" aria-label="Open ${n}"></a></div>
+  <a class="open" href="${f}">Open ${n} →</a></div>`).join("");
+const fit = () => document.querySelectorAll(".screen").forEach(s => s.querySelector("iframe").style.transform = `scale(${s.clientWidth / 1280})`);
+addEventListener("resize", fit); fit();
+document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => { const card = b.closest(".cell");
+  card.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  card.querySelector("iframe").contentWindow.location.hash = b.dataset.h || "#/";
+  card.querySelector(".screen a").href = card.querySelector(".open").href = b.dataset.f + b.dataset.h; });
+</script>
+</body>
+</html>

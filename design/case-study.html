@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Federal Money Atlas Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F7F5EE;--sheet:#FFFEFA;--ink:#2B2B26;--muted:#615F55;--line:#DEDACB;--in:#2F6B45;--in2:#5E8F6C;--in3:#9DBBA4;--out:#8A5A2C}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 "Barlow",system-ui,sans-serif}
+a{color:inherit}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+.top{display:flex;justify-content:space-between;align-items:center;height:60px;font:700 18px "Barlow Condensed";letter-spacing:.06em;text-transform:uppercase}
+.back{font-size:15px;text-decoration:none;color:var(--muted)}
+h1{font:700 52px/1 "Barlow Condensed";text-transform:uppercase;margin:24px 0 10px}
+.dek{font-size:21px;margin:0 0 12px;max-width:760px}
+.meta{font-size:15px;color:var(--muted);margin-bottom:18px}
+.cta{display:inline-block;background:var(--ink);color:var(--paper);text-decoration:none;padding:10px 18px;border-radius:5px;font:600 16px "Barlow Condensed";letter-spacing:.06em;text-transform:uppercase}
+.carousel{margin:28px 0 10px;position:relative}
+.screen{position:relative;border:1.5px solid var(--ink);border-radius:8px;overflow:hidden;background:var(--sheet);aspect-ratio:16/10}
+.screen iframe{position:absolute;top:0;left:0;width:1280px;height:800px;border:0;transform-origin:0 0;pointer-events:none}
+.screen a.open{position:absolute;inset:0;z-index:2}
+.cap{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:10px;font-size:15px;color:var(--muted);flex-wrap:wrap}
+.dots{display:flex;gap:8px}
+.dots button{width:30px;height:6px;border:0;border-radius:3px;background:var(--line);cursor:pointer;padding:0}
+.dots button.on{background:var(--ink)}
+.arrows button{border:1.5px solid var(--ink);background:var(--sheet);border-radius:99px;width:34px;height:34px;cursor:pointer;font-size:16px}
+section{margin:44px 0}
+h2{font:700 28px/1.1 "Barlow Condensed";text-transform:uppercase;margin:0 0 12px}
+p{margin:0 0 14px;max-width:780px}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+.cols div{background:var(--sheet);border-top:2px solid var(--ink);padding:12px 14px;font-size:15.5px}
+.cols b{display:block;font:700 18px "Barlow Condensed";text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.decisions{border-top:1.5px solid var(--ink)}
+.decisions div{display:grid;grid-template-columns:220px 1fr;gap:20px;padding:14px 0;border-bottom:1px solid var(--line)}
+.decisions h3{margin:0;font:700 17px "Barlow Condensed";text-transform:uppercase;letter-spacing:.05em}
+.decisions p{margin:0}
+.swatch{display:flex;gap:8px;margin:10px 0}
+.swatch span{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.swatch i{width:64px;height:36px;border-radius:4px;display:block}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.facts div{background:var(--sheet);padding:12px;border-radius:6px;border:1px solid var(--line)}
+.facts b{display:block;font:700 32px/1 "Barlow Condensed"}
+.facts span{font-size:14px;color:var(--muted)}
+ul.credits{padding-left:20px;max-width:780px}ul.credits li{margin-bottom:6px}
+footer{border-top:1.5px solid var(--ink);margin-top:50px;padding:18px 0 40px;font-size:14px;color:var(--muted)}
+@media (max-width:760px){h1{font-size:38px}.cols,.facts{grid-template-columns:1fr 1fr}.decisions div{grid-template-columns:1fr;gap:4px}}
+@media (max-width:480px){.cols,.facts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><span>Design case study</span><a class="back" href="v1.html">Open the prototype →</a></div>
+  <a class="back" href="directions.html">← All design directions</a>
+  <h1>Federal Money Atlas</h1>
+  <p class="dek">How much federal money comes back to each U.S. county for every $1 its residents pay in federal taxes.</p>
+  <div class="meta">Working name · Prototype v1 · Civic data · Free public website · Data: fiscal year 2023</div>
+  <a class="cta" href="v1.html">View prototype →</a>
+
+  <div class="carousel">
+    <div class="screen" id="screen"><iframe id="frame" title="Prototype screen" tabindex="-1"></iframe><a class="open" id="open" aria-label="Open this screen in the prototype"></a></div>
+    <div class="cap"><span id="caption"></span><span class="dots" id="dots"></span><span class="arrows"><button id="prev" aria-label="Previous screen">←</button> <button id="next" aria-label="Next screen">→</button></span></div>
+  </div>
+
+  <section>
+    <h2>The question</h2>
+    <p>Federal money reaches every county as Social Security checks, grants and contracts, but no one publishes, county by county, how that compares with the federal taxes residents pay. The last widely cited county estimate is from 2004, and the Census Bureau's county spending report ended with fiscal year 2010.</p>
+    <p>The site answers one question per county, in one sentence, with every number traceable to a public source. It is a neutral reference: no ratings of places as winners or losers, no party colors.</p>
+    <div class="facts">
+      <div><b>3,144</b><span>counties and county equivalents</span></div>
+      <div><b>12.9M</b><span>federal award transactions read</span></div>
+      <div><b>74¢</b><span>U.S. money back per $1, as counted</span></div>
+      <div><b>$1.09</b><span>for the typical (median) county</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Who it's for</h2>
+    <div class="cols">
+      <div><b>Residents</b>Curious what their county gets back. Needs the answer in seconds, in plain words.</div>
+      <div><b>Local reporters &amp; officials</b>Need trustworthy numbers, comparisons with neighbors, printable pages and downloads.</div>
+      <div><b>Teachers &amp; researchers</b>Need the method, the caveats and the full table.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Design decisions</h2>
+    <div class="decisions">
+      <div><h3>A dashboard that asks questions</h3><p>Borrowed from Axis Maps' <a href="https://www.axismaps.com/projects/california-birth-equity-connect">California Birth Equity Connect</a>. Panels beside the map are titled as questions ("What came back?", "Which counties?"). Each option shows its national figure. Choosing one recolors the map and rewrites the map's title, so the question on screen always matches what's drawn.</p></div>
+      <div><h3>Three ways to see the map</h3><p><b>Land</b> draws counties at their real size. <b>People</b> redraws each county as a circle sized by its population, because most Americans live in small, dense counties that a normal map hides. <b>Grid</b> (also from Axis Maps) groups nearby counties into equal cells over a muted basemap with city labels, smoothing out tiny counties with extreme values.</p></div>
+      <div><h3>The answer comes first</h3><p>Every county page opens with a sentence: "For every $1 residents paid in federal taxes, $0.75 in federal money came back, less than the typical county." Then one ledger: what came in, the dollars-back number with the U.S. average and the typical county, and what residents paid, on one shared scale.</p></div>
+      <div><h3>Details on demand</h3><p>The itemized table, neighbors, notes, "not counted" items and the method sit below the answer or in folded sections. Nothing is removed; it's simply not competing with the answer.</p></div>
+      <div><h3>A list for people who prefer tables</h3><p>Also following Axis Maps: every county in a sortable, filterable table, with the same size groups as the map.</p></div>
+      <div><h3>Compare, with a shareable link</h3><p>Pick a measure, pin up to three counties, and the address bar always reproduces the view, so a reporter can send exactly what they see.</p></div>
+      <div><h3>Estimates are always marked</h3><p>Grants from statewide programs (like Medicaid) and most non-income taxes are estimated. They carry an "est." tag and striped bars wherever they appear.</p></div>
+      <div><h3>Color and type</h3><p>Green for money in (three shades: Social Security, grants, contracts) and umber for taxes, everywhere. Neither is a party color. Map colors split counties into six equal-sized groups so the map shows real differences. Barlow and Barlow Condensed throughout, on an atlas-like paper and charcoal palette.</p>
+        <div class="swatch"><span><i style="background:var(--in)"></i>Social Security</span><span><i style="background:var(--in2)"></i>Grants</span><span><i style="background:var(--in3)"></i>Contracts</span><span><i style="background:var(--out)"></i>Taxes</span><span><i style="background:#F7F5EE;border:1px solid var(--line)"></i>Paper</span></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>How the numbers were checked</h2>
+    <p>Phase 0 rebuilt the figures from public files and compared them with published totals. Social Security and SSI came within 0.3% of Treasury's benefit payments. Contracts matched USAspending's published $760B total. State tax estimates landed within 8% of the Rockefeller Institute's state study (0.6% overall), and state results correlate at 0.97 with it.</p>
+  </section>
+
+  <section>
+    <h2>What's next</h2>
+    <p>Share statewide programs by enrollment instead of population; move nationwide contracts booked at one office into a "national programs" line; add five years of history and the monthly list of new awards and cancellations; a full methods page; and a newer base map that includes Connecticut's planning regions.</p>
+  </section>
+
+  <section>
+    <h2>Inspiration and credits</h2>
+    <ul class="credits">
+      <li><a href="https://www.axismaps.com/projects/california-birth-equity-connect">Axis Maps, California Birth Equity Connect</a>: question-titled filter panels, grid-cell map, list view.</li>
+      <li><a href="https://censusreporter.org/">Census Reporter</a>: one calm column with comparisons written into the numbers.</li>
+      <li><a href="https://www.oecdregionalwellbeing.org/">OECD Regional Well-Being</a>: the county-vs-country comparison line.</li>
+      <li><a href="https://evictionlab.org/map/">Eviction Lab</a>: measure switch and compare-up-to-3.</li>
+      <li><a href="https://design-system.service.gov.uk/">GOV.UK Design System</a>: question-led pages and folded details.</li>
+      <li>Data: USAspending.gov, IRS Statistics of Income, U.S. Treasury, Census Bureau, CMS.</li>
+    </ul>
+  </section>
+  <footer>Prototype for review, not published. Built with real fiscal year 2023 data from Phase 0 of the federal-money-map project.</footer>
+</div>
+<script>
+const SCREENS = [
+  ["#/", "Home: question-led dashboard with filter panels and the map (Land view)", "land"],
+  ["#/", "Grid view: equal cells over a muted basemap with city labels", "grid"],
+  ["#/county/39049", "County page: the answer sentence, then the ledger (Franklin County, Ohio)"],
+  ["#/list", "List view: every county in a sortable, filterable table"],
+  ["#/explore?m=ratio&c=13053&pins=39049,13053,06081", "Compare: measure switch, side panel and three pinned counties"],
+];
+let i = 0;
+const frame = document.getElementById("frame"), screen = document.getElementById("screen");
+function fit() { frame.style.transform = `scale(${screen.clientWidth / 1280})`; }
+function show(n) {
+  i = (n + SCREENS.length) % SCREENS.length; const [hash, cap, view] = SCREENS[i];
+  frame.src = "v1.html" + hash + (view ? "?view=" + view : "");  // hash changes alone don't reload a frame, so v1 reacts to the hash itself
+  document.getElementById("open").href = "v1.html" + hash + (view ? "?view=" + view : "");
+  document.getElementById("caption").textContent = `${i + 1} / ${SCREENS.length} · ${cap}`;
+  document.querySelectorAll("#dots button").forEach((d, k) => d.classList.toggle("on", k === i));
+}
+document.getElementById("dots").innerHTML = SCREENS.map((_, k) => `<button aria-label="Screen ${k + 1}"></button>`).join("");
+document.querySelectorAll("#dots button").forEach((d, k) => d.onclick = () => show(k));
+document.getElementById("prev").onclick = () => show(i - 1);
+document.getElementById("next").onclick = () => show(i + 1);
+addEventListener("resize", fit); fit(); show(0);
+</script>
+</body>
+</html>

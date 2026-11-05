@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600&family=DM+Mono:wght@400;500&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Libre+Franklin:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{ --page:#F6F5F2; --ink:#1E1E1C; --muted:#66625B; --line:#D9D5CC; --card:#FFFFFF; --chip:#ECEAE4; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --page:#1A1A19; --ink:#ECEAE5; --muted:#A8A39A; --line:#3A3936; --card:#232321; --chip:#2C2B29; }
+}
+:root[data-theme="dark"]{ --page:#1A1A19; --ink:#ECEAE5; --muted:#A8A39A; --line:#3A3936; --card:#232321; --chip:#2C2B29; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.5 "Public Sans",system-ui,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 16px 80px}
+header.top h1{font-size:28px;margin:0 0 6px;letter-spacing:-.01em}
+header.top p{margin:0 0 8px;color:var(--muted);max-width:780px}
+.note{font-size:13px;color:var(--muted)}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px}
+nav.toc a{font-size:13px;text-decoration:none;color:var(--ink);background:var(--chip);padding:4px 10px;border-radius:99px}
+.table-scroll{overflow-x:auto;margin-top:18px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+table.compare{border-collapse:collapse;width:100%;min-width:860px;font-size:13.5px}
+table.compare th,table.compare td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.compare th{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+table.compare tr:last-child td{border-bottom:0}
+.dots{letter-spacing:2px;white-space:nowrap}
+section.dir{margin-top:48px;border-top:1px solid var(--line);padding-top:28px}
+.dir-head{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:start}
+.dir-head h2{margin:0 0 4px;font-size:24px}
+.tag{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.tag.new{color:#8A6A1E}
+.dir-head p{margin:0 0 10px}
+.dir-head ul{margin:0;padding-left:18px;font-size:14px}
+.dir-head li{margin-bottom:5px}
+.dir-head a,.mix a{color:inherit}
+.swatches{display:flex;gap:6px;margin:10px 0 0;flex-wrap:wrap}
+.swatches span{width:30px;height:20px;border-radius:3px;border:1px solid rgba(0,0,0,.08)}
+details.spec{margin-top:16px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+details.spec summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:14px}
+.spec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 22px;padding:4px 14px 16px;font-size:14px}
+.spec-grid h4{margin:0 0 3px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.spec-grid p{margin:0}
+.frames{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:20px}
+.frame{border-radius:10px;overflow:hidden;border:1px solid var(--line);min-width:0}
+.frame-label{font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+svg.map{width:100%;height:auto;display:block}
+.legend{display:flex;align-items:center;gap:8px;font-size:12px;margin-top:8px;flex-wrap:wrap}
+.legend .ramp{display:flex;height:10px;flex:1;min-width:140px;max-width:280px;border-radius:2px;overflow:hidden}
+.legend .ramp i{flex:1}
+.legend .ticks{width:100%;display:flex;gap:10px;flex-wrap:wrap;opacity:.8}
+.mix{margin-top:48px;border-top:1px solid var(--line);padding-top:28px}
+.mix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:12px}
+.mix-grid div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:14px}
+.mix-grid h3{margin:0 0 6px;font-size:16px}
+@media (max-width:860px){ .dir-head,.frames,.mix-grid{grid-template-columns:1fr} .spec-grid{grid-template-columns:1fr 1fr} }
+@media (max-width:520px){ .spec-grid{grid-template-columns:1fr} }
+
+/* A Receipt */
+.A .frame{background:#FBF8F1;color:#1F1D1A;border-color:#E3DCCB}
+.A .home{padding:18px}
+.A .brand{font:600 13px "IBM Plex Mono",monospace;letter-spacing:.12em;text-transform:uppercase}
+.A .home h3{font:600 26px/1.15 "Public Sans";margin:8px 0 4px}
+.A .sub{font-size:14px;color:#6B6455;margin:0 0 10px}
+.A .search{font:14px "IBM Plex Mono",monospace;border:1.5px solid #1F1D1A;border-radius:4px;padding:8px 10px;margin-bottom:10px;background:#fff}
+.A .receipt-wrap{padding:22px 0;display:flex;justify-content:center;background:#EFE9DB}
+.A .receipt{width:min(340px,92%);background:#FFFEFA;padding:20px 20px 26px;font:13px/1.55 "IBM Plex Mono",monospace;color:#1F1D1A;
+  box-shadow:0 8px 24px rgba(60,45,10,.10);
+  -webkit-mask:radial-gradient(circle 6px at 50% 100%,transparent 98%,#000) bottom/14px 100% repeat-x;
+          mask:radial-gradient(circle 6px at 50% 100%,transparent 98%,#000) bottom/14px 100% repeat-x}
+.A .c{text-align:center}.A .title{font-weight:600;font-size:15px;letter-spacing:.04em}
+.A hr{border:0;border-top:1px dashed #9C9480;margin:10px 0}
+.A .row{display:flex;gap:6px}.A .row .l,.A .row .r{white-space:nowrap}
+.A .row .lead{flex:1;border-bottom:1px dotted #9C9480;transform:translateY(-4px)}
+.A .row.total{font-weight:600}
+.A .big{font-size:30px;font-weight:600;text-align:center;margin:6px 0 0}
+.A .tiny{font-size:11px;color:#6B6455}
+.A .barcode{height:34px;margin:12px auto 0;width:80%;background:repeating-linear-gradient(90deg,#1F1D1A 0 2px,transparent 2px 4px,#1F1D1A 4px 5px,transparent 5px 8px,#1F1D1A 8px 11px,transparent 11px 12px)}
+
+/* B Almanac */
+.B .frame{background:#fff;color:#222;border-color:#E2E2DF}
+.B .home{padding:20px}
+.B .home h3{font:600 28px/1.15 "Source Serif 4",Georgia,serif;margin:0 0 6px}
+.B .sub{font-size:14px;color:#5E5E5A;margin:0 0 12px}
+.B .facts{padding:20px;font-size:14px}
+.B .facts h4{font:600 22px/1.2 "Source Serif 4",Georgia,serif;margin:0}
+.B .meta{color:#6A6A66;font-size:13px;margin:2px 0 14px}
+.B .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.B .kpi{border-top:2px solid #2F6F6A;padding-top:6px}.B .kpi b{display:block;font-size:22px;font-weight:600}.B .kpi span{font-size:12px;color:#5E5E5A}
+.B table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.B td,.B th{padding:6px 4px;border-bottom:1px solid #ECECE8;text-align:right}
+.B td:first-child,.B th:first-child{text-align:left}
+.B th{font-size:12px;color:#6A6A66;font-weight:600}
+.B sup{color:#2F6F6A;font-weight:600}.B .foot{font-size:11px;color:#6A6A66;margin-top:10px}
+.B .btn{display:inline-block;margin-top:10px;font-size:12px;border:1px solid #2F6F6A;color:#2F6F6A;padding:3px 8px;border-radius:4px}
+
+/* C Ledger */
+.C .frame{background:#F2EFEA;color:#23211E;border-color:#DCD6CB}
+.C .home{padding:18px}
+.C .home h3{font:600 24px/1.2 "IBM Plex Sans";margin:0 0 4px}
+.C .sub{font-size:14px;color:#615B51;margin:0 0 10px}
+.C .ledger{padding:18px;font:14px "IBM Plex Sans"}
+.C .ledger h4{margin:0 0 2px;font-size:18px}.C .meta{font-size:12px;color:#615B51;margin-bottom:12px}
+.C .flow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.C h5{margin:0 0 6px;font:600 11px "IBM Plex Mono";letter-spacing:.08em;text-transform:uppercase;color:#615B51}
+.C .item{margin-bottom:8px;font:500 12px "IBM Plex Mono"}
+.C .item .lbl{display:flex;justify-content:space-between;gap:6px;margin-bottom:3px}
+.C .bar{height:12px;border-radius:2px}.C .in .bar{background:#2C7A72}.C .out .bar{background:#8C5A2B}
+.C .verdict{margin-top:12px;padding:10px 12px;background:#FFFDF8;border:1px solid #DCD6CB;border-radius:6px}
+.C .verdict b{font:600 22px "IBM Plex Mono"}
+
+/* D Atlas */
+.D .frame{background:#F7F5EE;color:#2B2B26;border-color:#DEDACB}
+.D .home{padding:18px}
+.D .home h3{font:600 30px/1.05 "Barlow Condensed";letter-spacing:.01em;text-transform:uppercase;margin:0 0 4px}
+.D .sub{font:15px "Barlow";color:#5F5E54;margin:0 0 10px}
+.D .toggle{display:inline-flex;border:1px solid #2B2B26;border-radius:99px;overflow:hidden;margin-bottom:8px;font:600 13px "Barlow Condensed";letter-spacing:.06em;text-transform:uppercase}
+.D .toggle button{border:0;background:transparent;padding:5px 14px;cursor:pointer;color:#2B2B26;font:inherit}
+.D .toggle button.on{background:#2B2B26;color:#F7F5EE}
+.D .plate{padding:18px;font:14px "Barlow"}
+.D .plate h4{font:600 26px/1 "Barlow Condensed";text-transform:uppercase;margin:0}
+.D .plate .meta{font:13px "Barlow";color:#5F5E54;margin:4px 0 12px}
+.D .strip{display:grid;grid-template-columns:repeat(3,1fr);border-top:1.5px solid #2B2B26;border-bottom:1.5px solid #2B2B26;margin-bottom:12px}
+.D .strip div{padding:8px 6px;border-right:1px solid #DEDACB}.D .strip div:last-child{border-right:0}
+.D .strip b{display:block;font:600 22px "Barlow Condensed"}.D .strip span{font-size:12px;color:#5F5E54}
+.D .caption{font:12px "Barlow";color:#5F5E54;margin-top:6px}
+
+/* E Card */
+.E .frame{background:#ECE6D8;color:#2A2620;border-color:#DCD3BE}
+.E .home{padding:18px;font-family:"Archivo"}
+.E .home h3{font:800 26px/1.05 "Archivo";font-stretch:112%;margin:0 0 4px}
+.E .sub{font-size:14px;color:#62594A;margin:0 0 12px}
+.E .deal{position:relative;height:340px;display:flex;justify-content:center;align-items:center}
+.E .deal .card{position:absolute;width:190px}
+.E .cardpage{padding:18px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.E .card{width:200px;border-radius:12px;background:#FFF8EA;padding:10px;box-shadow:0 6px 18px rgba(40,30,10,.18);font-family:"Archivo"}
+.E .card .inner{border:3px solid var(--acc);border-radius:8px;padding:10px;height:100%}
+.E .card .nm{font:800 17px/1.05 "Archivo";font-stretch:105%}
+.E .card .st{font:600 11px "Archivo";font-stretch:75%;letter-spacing:.12em;text-transform:uppercase;color:#6E6452}
+.E .card svg{width:100%;height:110px;display:block;margin:6px 0}
+.E .card .ratio{font:900 34px/1 "Archivo";font-stretch:110%;color:var(--acc)}
+.E .card .lab{font:600 11px "Archivo";font-stretch:80%;text-transform:uppercase;letter-spacing:.06em}
+.E .card .rk{display:inline-block;margin-top:6px;font:700 11px "Archivo";background:var(--acc);color:#FFF8EA;padding:2px 7px;border-radius:99px}
+.E .back table{width:100%;font:12px "Archivo";font-stretch:85%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.E .back td{padding:3px 0;border-bottom:1px dotted #CDBF9F}.E .back td:last-child{text-align:right;font-weight:700}
+.E .back h6{margin:0 0 6px;font:800 12px "Archivo";letter-spacing:.08em;text-transform:uppercase;color:var(--acc)}
+
+/* F Statement */
+.F .frame{background:#FFFFFF;color:#2A2A2A;border-color:#DADADA}
+.F .home{padding:18px;font-family:"Libre Franklin"}
+.F .home h3{font:700 22px/1.2 "Libre Franklin";margin:0 0 4px}
+.F .sub{font-size:14px;color:#5A5A5A;margin:0 0 10px}
+.F .search{font:14px "DM Mono";border:1px solid #2A2A2A;padding:8px 10px;margin-bottom:12px}
+.F .idx{max-height:330px;overflow:auto;border-top:2px solid #2A2A2A}
+.F .idx div{display:grid;grid-template-columns:34px 1fr 54px;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #EEE;font:13px "DM Mono"}
+.F .idx i{display:block;height:8px;background:#2F5D50}
+.F .stmt{padding:18px;font:13px "Libre Franklin"}
+.F .stmt .hd{display:flex;justify-content:space-between;gap:10px;border-bottom:2px solid #2A2A2A;padding-bottom:8px;margin-bottom:10px;flex-wrap:wrap}
+.F .stmt .hd b{font:700 15px "Libre Franklin";display:block}
+.F .stmt .hd span{font-size:11px;color:#5A5A5A}
+.F .box{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #2A2A2A;margin-bottom:12px}
+.F .box div{padding:8px;border-right:1px solid #2A2A2A}.F .box div:last-child{border-right:0;background:#EEF3F1}
+.F .box span{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#5A5A5A}.F .box b{display:block;font:500 17px "DM Mono"}
+.F table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin-bottom:10px}
+.F th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;text-align:right;color:#5A5A5A;border-bottom:1px solid #2A2A2A;padding:4px}
+.F th:first-child,.F td:first-child{text-align:left}
+.F td{padding:4px;text-align:right;border-bottom:1px solid #EEE;font-family:"DM Mono"}
+.F td:first-child{font-family:"Libre Franklin"}
+.F tr.sec td{font:700 11px "Libre Franklin";text-transform:uppercase;letter-spacing:.06em;background:#F4F4F4}
+.F .pending{color:#9A9A9A}
+
+/* G Explorer */
+.G .frame{background:#EEF0EC;color:#1D2522;border-color:#D6DBD4}
+.G .app{display:grid;grid-template-columns:1.5fr 1fr;min-height:420px;font-family:"Figtree"}
+.G .mapside{padding:12px;position:relative}
+.G .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.G .chips span{font:600 12px "Figtree";padding:4px 10px;border-radius:99px;background:#fff;border:1px solid #D6DBD4}
+.G .chips span.on{background:#1F4E3D;color:#fff;border-color:#1F4E3D}
+.G .panel{background:#fff;border-left:1px solid #D6DBD4;padding:14px;font-size:13px}
+.G .panel h4{margin:0;font:700 18px "Figtree"}.G .panel .meta{color:#5B6661;font-size:12px;margin-bottom:10px}
+.G .stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #EEF0EC}
+.G .stat b{font-variant-numeric:tabular-nums}
+.G .rank{margin-top:10px}
+.G .rank div{display:grid;grid-template-columns:1fr 60px 40px;gap:6px;align-items:center;font-size:12px;padding:2px 0}
+.G .rank div.me{font-weight:700}
+.G .rank i{display:block;height:6px;background:#7FAF8E;border-radius:3px}
+.G .rank div.me i{background:#1F4E3D}
+.G .pin{margin-top:10px;font:600 12px "Figtree";color:#1F4E3D}
+.G .mini{font-size:12px;padding:0 18px 14px;color:#5B6661}
+@media (max-width:860px){ .G .app{grid-template-columns:1fr} .G .panel{border-left:0;border-top:1px solid #D6DBD4} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1>Design directions</h1>
+  <p>Seven options. Each shows a home page with a map and one county page. A–C are the first three, now with more detail; D–G are new. The maps and county numbers are real Phase 0 results for fiscal year 2023; everything else is a sketch. No palette uses red or blue.</p>
+  <p class="note" id="sample-note"></p>
+  <nav class="toc"><a href="#A">A · Receipt</a><a href="#B">B · Almanac</a><a href="#C">C · Ledger</a><a href="#D">D · Atlas</a><a href="#E">E · County Card</a><a href="#F">F · Statement</a><a href="#G">G · Explorer</a><a href="#mix">Mix &amp; match</a></nav>
+  <div class="table-scroll"><table class="compare">
+    <tr><th>Direction</th><th>Feels like</th><th>Best for</th><th>Shareable</th><th>Feels neutral</th><th>On phones</th><th>Build effort</th><th>Overlap with Rx Receipt</th></tr>
+    <tr><td><b>A · Receipt</b></td><td>A printed itemized receipt</td><td>Instant "aha", screenshots</td><td class="dots">●●●●○</td><td class="dots">●●●○○</td><td class="dots">●●●●●</td><td>Low–medium</td><td>High (also uses a receipt look)</td></tr>
+    <tr><td><b>B · Almanac</b></td><td>A reference book / fact sheet</td><td>Trust, citations, search engines</td><td class="dots">●●○○○</td><td class="dots">●●●●●</td><td class="dots">●●●●○</td><td>Low</td><td>Low</td></tr>
+    <tr><td><b>C · Ledger</b></td><td>A two-column account book</td><td>Seeing both sides at once</td><td class="dots">●●●○○</td><td class="dots">●●○○○</td><td class="dots">●●●○○</td><td>Medium</td><td>Low</td></tr>
+    <tr><td><b>D · Atlas</b> <span class="tag new">new</span></td><td>A printed national atlas</td><td>An honest map (people, not land)</td><td class="dots">●●●●○</td><td class="dots">●●●●○</td><td class="dots">●●●●○</td><td>Medium–high</td><td>None</td></tr>
+    <tr><td><b>E · County Card</b> <span class="tag new">new</span></td><td>A collectible trading card</td><td>Sharing, classrooms, comparing two places</td><td class="dots">●●●●●</td><td class="dots">●●●○○</td><td class="dots">●●●●●</td><td>Medium</td><td>None</td></tr>
+    <tr><td><b>F · Statement</b> <span class="tag new">new</span></td><td>A year-end account statement</td><td>Trends and cancellations; printing</td><td class="dots">●●○○○</td><td class="dots">●●●●○</td><td class="dots">●●●○○</td><td>Low–medium</td><td>Some (document style)</td></tr>
+    <tr><td><b>G · Explorer</b> <span class="tag new">new</span></td><td>A map app with a side panel</td><td>Journalists and heavy users</td><td class="dots">●●●○○</td><td class="dots">●●●●○</td><td class="dots">●●●○○</td><td>High</td><td>None</td></tr>
+  </table></div>
+  <p class="note">Map change since the first draft: colors now split counties into equal-sized groups (quantiles) instead of multiples of the U.S. average. With the old breaks, 82% of counties fell in the "above average" colors and the maps looked almost uniform.</p>
+</header>
+
+<!-- ======================= A ======================= -->
+<section class="dir A" id="A">
+  <div class="dir-head">
+    <div>
+      <span class="tag">Direction A</span>
+      <h2>The Receipt</h2>
+      <p>Map first: a big county map shaded by dollars back, with a search box. Each county page is an itemized receipt: line items for the money in, taxes as the "payment", and dollars back per $1 as the bottom line. The receipt makes a page you can grasp in two seconds and screenshot.</p>
+      <div class="swatches" id="sw-A"></div>
+    </div>
+    <div><ul>
+      <li><a href="https://www.gov.uk/annual-tax-summary" target="_blank" rel="noopener">UK Annual Tax Summary</a>: the government sends each taxpayer a statement of where their tax went.</li>
+      <li><a href="https://receiptify.herokuapp.com/" target="_blank" rel="noopener">Receiptify</a>: listening history printed as a receipt; it shows how well the format spreads on social media.</li>
+      <li>Thermal-printer type: monospace, dotted leaders, a torn edge. IBM Plex Mono and Public Sans.</li>
+    </ul></div>
+  </div>
+  <details class="spec"><summary>Page by page</summary><div class="spec-grid">
+    <div><h4>Home</h4><p>Full-width map, search by county or ZIP, and a strip of "biggest changes this year" (after Phase 1). Hovering a county shows a mini receipt.</p></div>
+    <div><h4>County page</h4><p>Receipt grouped into benefits, grants and contracts, then taxes and the bottom line. Below it, a second receipt of the top recipients, and a "history" printout with one line per year.</p></div>
+    <div><h4>Map</h4><p>One ochre-to-umber scale on cream paper, in equal-sized groups. State lines in umber.</p></div>
+    <div><h4>Type &amp; color</h4><p>IBM Plex Mono for figures, Public Sans for text. Cream paper, umber ink, one ochre accent.</p></div>
+    <div><h4>Motion</h4><p>On first visit the receipt "prints" line by line and the total ticks up. Turned off for people who prefer reduced motion.</p></div>
+    <div><h4>On phones</h4><p>The best fit of all seven: a receipt is already narrow.</p></div>
+    <div><h4>Good at</h4><p>Instant understanding and sharing. A "save receipt as image" button is easy to add.</p></div>
+    <div><h4>Watch out for</h4><p>"Receipt" implies a purchase ("you paid, you got"), which oversimplifies taxes. Long tables in monospace get tiring. Looks a lot like your Rx Receipt site.</p></div>
+    <div><h4>Build effort</h4><p>Low–medium.</p></div>
+  </div></details>
+  <div class="frames">
+    <div><p class="frame-label">Home</p><div class="frame"><div class="home">
+      <div class="brand">Federal money map</div>
+      <h3>Where federal money lands, county by county</h3>
+      <p class="sub">Dollars back per $1 of federal tax, fiscal year 2023.</p>
+      <div class="search">Search a county or ZIP…</div>
+      <svg class="map" id="map-A" viewBox="0 0 975 610" role="img" aria-label="County map, ochre scale"></svg>
+      <div class="legend" id="lg-A"></div>
+    </div></div></div>
+    <div><p class="frame-label">County page</p><div class="frame"><div class="receipt-wrap"><div class="receipt" id="receipt"></div></div></div></div>
+  </div>
+</section>
+
+<!-- ======================= B ======================= -->
+<section class="dir B" id="B">
+  <div class="dir-head">
+    <div>
+      <span class="tag">Direction B</span>
+      <h2>The Almanac</h2>
+      <p>A reference book. A quiet map with a state list beside it. County pages are fact sheets: two headline numbers, clean tables, a numbered source note on every figure, and a download button on every table. Closest to the "plain civic reference" tone you picked.</p>
+      <div class="swatches" id="sw-B"></div>
+    </div>
+    <div><ul>
+      <li><a href="https://ourworldindata.org/" target="_blank" rel="noopener">Our World in Data</a>: every chart has sources, a download button and a written method.</li>
+      <li><a href="https://www.census.gov/quickfacts/" target="_blank" rel="noopener">Census QuickFacts</a>: a one-page fact sheet for any county.</li>
+      <li><a href="https://usafacts.org/" target="_blank" rel="noopener">USAFacts</a>: neutral government-finance explainers.</li>
+    </ul></div>
+  </div>
+  <details class="spec"><summary>Page by page</summary><div class="spec-grid">
+    <div><h4>Home</h4><p>Map plus search, a "browse by state" list and a short "how to read this" paragraph. The methods page is linked prominently.</p></div>
+    <div><h4>County page</h4><p>Headline figures, a money-in / taxes table, 5-year sparklines per category, a top-recipients table, a "statewide programs (estimated)" section, footnotes, and CSV downloads.</p></div>
+    <div><h4>Map</h4><p>Gray-to-teal, white state lines. A "show as table" switch for screen readers and for people who don't read maps.</p></div>
+    <div><h4>Type &amp; color</h4><p>Source Serif 4 headings; Public Sans text (the font of the U.S. Web Design System). White page, teal accent.</p></div>
+    <div><h4>Motion</h4><p>Almost none: gentle fades. Nothing counts up.</p></div>
+    <div><h4>On phones</h4><p>Tables turn into stacked rows; the map can be pinch-zoomed.</p></div>
+    <div><h4>Good at</h4><p>Trust, neutrality and citations. Lots of plain text helps search engines. The easiest to keep accurate.</p></div>
+    <div><h4>Watch out for</h4><p>Can feel dry and is the least shareable, so it needs a good share image (see the mixes below).</p></div>
+    <div><h4>Build effort</h4><p>Low.</p></div>
+  </div></details>
+  <div class="frames">
+    <div><p class="frame-label">Home</p><div class="frame"><div class="home">
+      <h3>Federal spending and taxes, by county</h3>
+      <p class="sub">Dollars received per $1 of federal taxes paid, fiscal year 2023. Hover over a county for details.</p>
+      <svg class="map" id="map-B" viewBox="0 0 975 610" role="img" aria-label="County map, teal scale"></svg>
+      <div class="legend" id="lg-B"></div>
+    </div></div></div>
+    <div><p class="frame-label">County page</p><div class="frame"><div class="facts" id="facts"></div></div></div>
+  </div>
+</section>
+
+<!-- ======================= C ======================= -->
+<section class="dir C" id="C">
+  <div class="dir-head">
+    <div>
+      <span class="tag">Direction C</span>
+      <h2>The Ledger</h2>
+      <p>Money in, money out. The map uses a two-sided scale centered on the typical county, so a place reads as above or below the middle. County pages show two columns of bars, what came in and what residents paid. A later version could turn the bars into a flow from each program into the county.</p>
+      <div class="swatches" id="sw-C"></div>
+    </div>
+    <div><ul>
+      <li><a href="https://www.usaspending.gov/explorer" target="_blank" rel="noopener">USAspending Spending Explorer</a>: drill from a budget function down to a program.</li>
+      <li>Open Knowledge Foundation's <a href="https://datajournalism.com/read/handbook/one/case-studies/covering-the-public-purse-with-open-spending-org" target="_blank" rel="noopener">Where Does My Money Go? / OpenSpending</a> (2009–2011, now offline): UK spending explored by region and type.</li>
+      <li><a href="https://github.com/Financial-Times/chart-doctor/tree/main/visual-vocabulary" target="_blank" rel="noopener">FT Visual Vocabulary</a>: when a two-sided scale fits.</li>
+    </ul></div>
+  </div>
+  <details class="spec"><summary>Page by page</summary><div class="spec-grid">
+    <div><h4>Home</h4><p>Two-sided map with a legend that explains the middle. Headline: "above or below the typical county?"</p></div>
+    <div><h4>County page</h4><p>Came in vs. paid out, side by side, with a balance line. Later a flow diagram from programs into the county and out to tax types.</p></div>
+    <div><h4>Map</h4><p>Brown-to-teal, centered on the median county ($<span class="median"></span>), not the U.S. average, because most counties sit above the average.</p></div>
+    <div><h4>Type &amp; color</h4><p>IBM Plex Sans and Mono. Warm gray page; teal for money in, brown for taxes.</p></div>
+    <div><h4>Motion</h4><p>Bars grow in; later, particles moving along the flow lines.</p></div>
+    <div><h4>On phones</h4><p>The two columns stack: in, then out.</p></div>
+    <div><h4>Good at</h4><p>Showing both sides at once; comparisons are obvious.</p></div>
+    <div><h4>Watch out for</h4><p>Two-sided maps invite a "winners and losers" reading, which makes this the most partisan-risky option. Wording like "balance" must never become "owed".</p></div>
+    <div><h4>Build effort</h4><p>Medium (the flow diagram is extra).</p></div>
+  </div></details>
+  <div class="frames">
+    <div><p class="frame-label">Home</p><div class="frame"><div class="home">
+      <h3>Is your county above or below the middle?</h3>
+      <p class="sub">Brown: less back than the typical county. Teal: more. Fiscal year 2023.</p>
+      <svg class="map" id="map-C" viewBox="0 0 975 610" role="img" aria-label="County map, two-sided brown-teal scale"></svg>
+      <div class="legend" id="lg-C"></div>
+    </div></div></div>
+    <div><p class="frame-label">County page</p><div class="frame"><div class="ledger" id="ledger"></div></div></div>
+  </div>
+</section>
+
+<!-- ======================= D ======================= -->
+<section class="dir D" id="D">
+  <div class="dir-head">
+    <div>
+      <span class="tag new">Direction D · new</span>
+      <h2>The Atlas</h2>
+      <p>A printed national atlas, with one big idea: a <b>Land / People</b> switch. On a normal map, huge thinly populated western counties take most of the ink, while most Americans live in small, dense counties. The People view draws each county as a circle sized by population, so the map is weighted by people. Try the switch on the mockup.</p>
+      <div class="swatches" id="sw-D"></div>
+    </div>
+    <div><ul>
+      <li><a href="https://en.wikipedia.org/wiki/National_Atlas_of_the_United_States" target="_blank" rel="noopener">National Atlas of the United States</a> (USGS, 1970–2014): the government's own reference atlas.</li>
+      <li><a href="https://www.swisstopo.admin.ch/en/maps" target="_blank" rel="noopener">swisstopo</a>: hairline detail, condensed labels, calm earth colors.</li>
+      <li>Danny Dorling's population cartograms (<a href="https://worldmapper.org/" target="_blank" rel="noopener">Worldmapper</a>): circles sized by people.</li>
+    </ul></div>
+  </div>
+  <details class="spec"><summary>Page by page</summary><div class="spec-grid">
+    <div><h4>Home</h4><p>Hero map with the Land / People switch, search, and click-to-zoom into a state. The switch remembers your choice.</p></div>
+    <div><h4>County page</h4><p>An atlas "plate": a locator map, a strip of big numbers, the county's place among its neighbors ("vs. the counties next door"), and the state drawn as a small people-weighted map.</p></div>
+    <div><h4>Map</h4><p>Sage-to-forest scale, hairline gray borders, labels in condensed capitals like a printed atlas.</p></div>
+    <div><h4>Type &amp; color</h4><p>Barlow Condensed for headings and labels, Barlow for text. Off-white paper, charcoal ink, greens.</p></div>
+    <div><h4>Motion</h4><p>Circles slide out from each county's center when switching to People, and back again.</p></div>
+    <div><h4>On phones</h4><p>The People view reads well on a small screen; the Land view needs zooming.</p></div>
+    <div><h4>Good at</h4><p>Fixes the biggest honesty problem of county maps (land isn't people). Beautiful, and map lovers share it.</p></div>
+    <div><h4>Watch out for</h4><p>Population cartograms are unfamiliar, so they need a one-line explainer. More code, and a heavier first page load.</p></div>
+    <div><h4>Build effort</h4><p>Medium–high.</p></div>
+  </div></details>
+  <div class="frames">
+    <div><p class="frame-label">Home</p><div class="frame"><div class="home">
+      <h3>The federal money atlas</h3>
+      <p class="sub">Dollars back per $1 of federal tax, fiscal year 2023.</p>
+      <div class="toggle" role="group" aria-label="Map view"><button class="on" data-v="land">Land</button><button data-v="people">People</button></div>
+      <svg class="map" id="map-D" viewBox="0 0 975 610" role="img" aria-label="County map, green scale, switchable to a population cartogram"></svg>
+      <div class="legend" id="lg-D"></div>
+      <div class="caption" id="cap-D">Land view: each county drawn at its real size.</div>
+    </div></div></div>
+    <div><p class="frame-label">County page</p><div class="frame"><div class="plate" id="plate"></div></div></div>
+  </div>
+</section>
+
+<!-- ======================= E ======================= -->
+<section class="dir E" id="E">
+  <div class="dir-head">
+    <div>
+      <span class="tag new">Direction E · new</span>
+      <h2>The County Card</h2>
+      <p>Every county is a collectible card. The front has the county's shape, the big number and its rank; the back has a stat table like the back of a baseball card. The full details sit in plain tables below the card. Cards make it natural to compare two places, share an image, or use the site in a classroom.</p>
+      <div class="swatches" id="sw-E"></div>
+    </div>
+    <div><ul>
+      <li>Topps baseball card backs: a dense, much-loved stat table in a small space.</li>
+      <li><a href="https://en.wikipedia.org/wiki/Passport_to_Your_National_Parks" target="_blank" rel="noopener">Passport to Your National Parks</a> stamps: collecting the places you've been.</li>
+      <li>Wikipedia infoboxes: the same key facts in the same spot on every page.</li>
+    </ul></div>
+  </div>
+  <details class="spec"><summary>Page by page</summary><div class="spec-grid">
+    <div><h4>Home</h4><p>"Deal me a county" (random card), search, and "compare two cards". Optional: collect counties you've lived in or visited, saved in your browser, no accounts.</p></div>
+    <div><h4>County page</h4><p>Card front and back (tap to flip), "save card as image", then the full tables, trend and recipients in a plain layout.</p></div>
+    <div><h4>Map</h4><p>A smaller map on the home page; the card is the hook. Each card's color comes from its census region (four earth tones), not its result.</p></div>
+    <div><h4>Type &amp; color</h4><p>Archivo, a variable font that can go wide and bold for names or narrow for stat tables. Cream card stock.</p></div>
+    <div><h4>Motion</h4><p>Card flip; a short "deal" animation; cards fan out in compare mode.</p></div>
+    <div><h4>On phones</h4><p>One card fills the screen; swipe to move to neighboring counties.</p></div>
+    <div><h4>Good at</h4><p>The most shareable, and works for teachers and local news. Comparing places feels natural.</p></div>
+    <div><h4>Watch out for</h4><p>A playful tone can trivialize the subject, and a rank on a card invites competition. Keep the rank quiet ("of 3,144") and the method one tap away.</p></div>
+    <div><h4>Build effort</h4><p>Medium (share images need a small image-making step at build time).</p></div>
+  </div></details>
+  <div class="frames">
+    <div><p class="frame-label">Home</p><div class="frame"><div class="home">
+      <h3>Deal me a county</h3>
+      <p class="sub">Every county's federal money on one card. Search, shuffle, or compare two.</p>
+      <div class="deal" id="deal"></div>
+    </div></div></div>
+    <div><p class="frame-label">County page (front and back)</p><div class="frame"><div class="cardpage" id="cardpage"></div></div></div>
+  </div>
+</section>
+
+<!-- ======================= F ======================= -->
+<section class="dir F" id="F">
+  <div class="dir-head">
+    <div>
+      <span class="tag new">Direction F · new</span>
+      <h2>The Statement</h2>
+      <p>A year-end account statement for each county. Sections for benefits, grants, contracts and taxes, each with columns for this year, the 5-year average and the change. An "adjustments" section lists cancellations and money taken back, with dates. Built around the trend and cancellation features, and it prints cleanly for a council meeting or a newsroom.</p>
+      <div class="swatches" id="sw-F"></div>
+    </div>
+    <div><ul>
+      <li>Year-end bank statements: summary box first, then itemized sections.</li>
+      <li>Pay stubs: "current" and "year-to-date" columns side by side, here "this year" and "5-year average".</li>
+      <li>The annual Social Security Statement's plain layout, borrowed for layout only (no seals or official look).</li>
+    </ul></div>
+  </div>
+  <details class="spec"><summary>Page by page</summary><div class="spec-grid">
+    <div><h4>Home</h4><p>"Find your county's statement": search plus an index of states with ratio bars. A small grayscale map.</p></div>
+    <div><h4>County page</h4><p>Header with "period covered" and "data as of". Summary box, sections with this year / 5-year average / change, the adjustments list, and a printable footer with sources.</p></div>
+    <div><h4>Map</h4><p>Home page only, small and gray, so the statement stays the focus.</p></div>
+    <div><h4>Type &amp; color</h4><p>Libre Franklin text, DM Mono figures. White, charcoal, one ink-green accent.</p></div>
+    <div><h4>Motion</h4><p>None beyond hover highlights. A print stylesheet makes a one-page PDF.</p></div>
+    <div><h4>On phones</h4><p>Shows "this year" by default, with a switch for the other columns.</p></div>
+    <div><h4>Good at</h4><p>Change over time and cancellations, the features no competitor does at county level. Printable.</p></div>
+    <div><h4>Watch out for</h4><p>Must never look like an official government document (no seals, no "Department of"). Dense. It's another document style, close to Rx Receipt's lab-report look.</p></div>
+    <div><h4>Build effort</h4><p>Low–medium.</p></div>
+  </div></details>
+  <div class="frames">
+    <div><p class="frame-label">Home</p><div class="frame"><div class="home">
+      <h3>Federal money statements, by county</h3>
+      <p class="sub">Fiscal year 2023. States ranked by dollars back per $1 (state totals from Phase 0).</p>
+      <div class="search">Find your county…</div>
+      <div class="idx" id="idx"></div>
+    </div></div></div>
+    <div><p class="frame-label">County page</p><div class="frame"><div class="stmt" id="stmt"></div></div></div>
+  </div>
+</section>
+
+<!-- ======================= G ======================= -->
+<section class="dir G" id="G">
+  <div class="dir-head">
+    <div>
+      <span class="tag new">Direction G · new</span>
+      <h2>The Explorer</h2>
+      <p>The home page is the tool: a map that fills the screen, a side panel for the selected county, chips to switch the measure (dollars back, money per person, Social Security share, contracts share), and a compare mode that pins up to three counties. Every view has its own link, so any comparison can be shared.</p>
+      <div class="swatches" id="sw-G"></div>
+    </div>
+    <div><ul>
+      <li><a href="https://www.opportunityatlas.org/" target="_blank" rel="noopener">The Opportunity Atlas</a> (Census Bureau + Opportunity Insights): a neutral, map-first explorer of local data.</li>
+      <li>Census Bureau <a href="https://census.gov/newsroom/press-releases/2022/my-community-explorer-tool.html" target="_blank" rel="noopener">My Community Explorer</a> (2022): county outlines with a data panel, zooming down to tracts.</li>
+      <li>Map apps (Google Maps, Zillow): map plus panel on desktop, bottom sheet on phones.</li>
+    </ul></div>
+  </div>
+  <details class="spec"><summary>Page by page</summary><div class="spec-grid">
+    <div><h4>Home</h4><p>The app itself: map, measure chips, search and compare. There's also a plain page per county for search engines and sharing.</p></div>
+    <div><h4>County page</h4><p>The panel, expanded: key figures, the county's rank in its state, neighbors, trend and recipients.</p></div>
+    <div><h4>Map</h4><p>Sand-to-deep-green; the selected county is outlined; zoom and pan; the colors change with the chosen measure.</p></div>
+    <div><h4>Type &amp; color</h4><p>Figtree, a friendly app font. Light gray background, white panels, deep green accent.</p></div>
+    <div><h4>Motion</h4><p>The map glides to the selected county; the panel slides in.</p></div>
+    <div><h4>On phones</h4><p>Map on top, details in a bottom sheet you drag up, like a map app.</p></div>
+    <div><h4>Good at</h4><p>Journalists and researchers; many measures without new pages; strong for comparisons.</p></div>
+    <div><h4>Watch out for</h4><p>The heaviest to build and test. It can overwhelm casual visitors, and the plain county pages are still needed.</p></div>
+    <div><h4>Build effort</h4><p>High.</p></div>
+  </div></details>
+  <div class="frames" style="grid-template-columns:1fr">
+    <div><p class="frame-label">Home (the app)</p><div class="frame"><div class="app">
+      <div class="mapside">
+        <div class="chips"><span class="on">Dollars back</span><span>Money per person</span><span>Social Security share</span><span>Contracts share</span></div>
+        <svg class="map" id="map-G" viewBox="0 0 975 610" role="img" aria-label="County map, green scale, sample county outlined"></svg>
+        <div class="legend" id="lg-G"></div>
+      </div>
+      <div class="panel" id="panel"></div>
+    </div></div></div>
+  </div>
+</section>
+
+<section class="mix" id="mix">
+  <h2>Mix &amp; match</h2>
+  <p class="note">The directions combine well. Three combinations worth considering:</p>
+  <div class="mix-grid">
+    <div><h3>Almanac + Atlas</h3><p>B's fact-sheet county pages, with D's Land / People map on the home page. The most defensible pairing, and it fixes the map's land-vs-people bias. <b>My pick if you want one.</b></p></div>
+    <div><h3>Almanac + Card</h3><p>B's pages for reading, plus an E-style card image for sharing: every page gets a "share this county" card. Trust for readers, reach for social media.</p></div>
+    <div><h3>Statement + Explorer</h3><p>F's statements for each county, with G's explorer as the home page. Best if journalists and local officials are the main audience. The most work.</p></div>
+  </div>
+</section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script>
+const DATA = __DATA__;
+const S = DATA.sample, US = DATA.us_ratio, MED = DATA.median_ratio;
+const fmt$ = v => { const a = Math.abs(v), s = v < 0 ? "−$" : "$";
+  return a >= 1e9 ? s + (a/1e9).toFixed(2) + "B" : a >= 1e6 ? s + (a/1e6).toFixed(1) + "M" : s + Math.round(a).toLocaleString(); };
+const r2 = v => "$" + v.toFixed(2);
+document.querySelectorAll(".median").forEach(e => e.textContent = MED.toFixed(2));
+document.getElementById("sample-note").textContent =
+  `Sample county: ${S.county}, ${S.state}. U.S. average $${US.toFixed(2)} back per $1; typical (median) county $${MED.toFixed(2)}. Connecticut is blank on the sketch maps because the base map still uses its old counties.`;
+
+// ---------- color scales (quantiles of the county ratio)
+const vals = Object.values(DATA.counties).map(v => v[0]).filter(v => v != null && isFinite(v)).sort(d3.ascending);
+const qs = k => d3.range(1, k).map(i => d3.quantileSorted(vals, i / k));
+const RAMPS = {
+  A: ["#F3E9D2","#E2C48A","#C98F3C","#9A5B1E","#5C3310"],
+  B: ["#EEF0EE","#C9DCD8","#8DB9B2","#4F918A","#2F6F6A","#1D4A47"],
+  C: ["#8C5A2B","#C9A36E","#EFE8D8","#7FB8AF","#2C7A72"],
+  D: ["#EEEEDD","#D3DBB5","#A9C08A","#7A9A5E","#4E7440","#2E4F2A"],
+  E: ["#2C6E6A","#C08A2E","#6E7B3A","#8B6A4A"],
+  F: ["#2F5D50"],
+  G: ["#F4EBD0","#D9DDB0","#A9C79A","#6FA585","#3F7C65","#1F4E3D"],
+};
+function scaleFor(k) {
+  if (k === "C") { // centered on the median: middle band = 40th-60th percentile
+    return d3.scaleThreshold().domain([0.15, 0.4, 0.6, 0.85].map(p => d3.quantileSorted(vals, p))).range(RAMPS.C);
+  }
+  return d3.scaleThreshold().domain(qs(RAMPS[k].length)).range(RAMPS[k]);
+}
+function legend(k, sc, lo = "less back", hi = "more back") {
+  const el = document.getElementById("lg-" + k); if (!el) return;
+  el.innerHTML = `<span>${lo}</span><span class="ramp">${sc.range().map(c => `<i style="background:${c}"></i>`).join("")}</span><span>${hi}</span>
+    <span class="ticks">Breaks: ${sc.domain().map(r2).join(" · ")} back per $1${k === "C" ? " (middle band = typical counties)" : " (equal-sized groups of counties)"}</span>`;
+}
+function swatches(k, colors) { const el = document.getElementById("sw-" + k); if (el) el.innerHTML = colors.map(c => `<span style="background:${c}" title="${c}"></span>`).join(""); }
+swatches("E", ["#FFF8EA", ...RAMPS.E]); swatches("F", ["#FFFFFF", "#EEF3F1", "#2A2A2A", "#2F5D50"]);
+
+fetch("https://cdn.jsdelivr.net/npm/us-atlas@3.0.1/counties-albers-10m.json").then(r => r.json()).then(us => {
+  const counties = topojson.feature(us, us.objects.counties).features;
+  const states = topojson.mesh(us, us.objects.states, (a, b) => a !== b);
+  const nation = topojson.mesh(us, us.objects.nation);
+  const path = d3.geoPath();
+  const val = id => (DATA.counties[id] || [null])[0];
+  const title = d => { const c = DATA.counties[d.id]; return c ? `${c[2]}, ${c[3]}: ${c[0] == null ? "no ratio" : r2(c[0]) + " back per $1"}` : d.properties.name; };
+
+  function draw(k, opts = {}) {
+    const sc = scaleFor(k), svg = d3.select("#map-" + k);
+    const g = svg.append("g").attr("class", "land");
+    g.selectAll("path").data(counties).join("path").attr("d", path)
+      .attr("fill", d => { const v = val(d.id); return v == null ? "#D8D4CC" : sc(v); })
+      .attr("stroke", opts.countyStroke || "none").attr("stroke-width", opts.countyStrokeW || 0.2)
+      .append("title").text(title);
+    g.append("path").attr("d", path(states)).attr("fill", "none")
+      .attr("stroke", opts.stateStroke).attr("stroke-width", opts.stateW || 0.6).attr("stroke-opacity", opts.stateOp || .6);
+    if (opts.highlight) {
+      const f = counties.find(c => c.id === opts.highlight);
+      if (f) svg.append("path").attr("d", path(f)).attr("fill", "none").attr("stroke", "#111").attr("stroke-width", 2.2);
+    }
+    legend(k, sc); swatches(k, sc.range());
+    return { svg, sc };
+  }
+  draw("A", { stateStroke: "#5C3310" });
+  draw("B", { countyStroke: "#fff", stateStroke: "#fff", stateW: 1.2 });
+  draw("C", { stateStroke: "#23211E" });
+  draw("G", { countyStroke: "#F4EBD0", countyStrokeW: 0.15, stateStroke: "#1F4E3D", highlight: S.fips });
+
+  // ---------- D: Land / People
+  const D = draw("D", { countyStroke: "#F7F5EE", countyStrokeW: 0.12, stateStroke: "#2B2B26", stateW: 0.5 });
+  D.svg.append("path").attr("d", path(nation)).attr("fill", "none").attr("stroke", "#2B2B26").attr("stroke-width", .8).attr("class", "outline");
+  const nodes = counties.map(f => { const c = DATA.counties[f.id]; const [x, y] = path.centroid(f);
+    return { id: f.id, x0: x, y0: y, x, y, r: c ? Math.max(0.6, 0.0128 * Math.sqrt(c[1])) : 0, v: c ? c[0] : null }; })
+    .filter(n => n.r > 0 && isFinite(n.x0));
+  const sim = d3.forceSimulation(nodes).force("x", d3.forceX(d => d.x0).strength(0.12)).force("y", d3.forceY(d => d.y0).strength(0.12))
+    .force("collide", d3.forceCollide(d => d.r + 0.35).iterations(2)).stop();
+  for (let i = 0; i < 160; i++) sim.tick();
+  const dots = D.svg.append("g").attr("class", "people").style("opacity", 0).style("pointer-events", "none")
+    .selectAll("circle").data(nodes).join("circle")
+    .attr("cx", d => d.x0).attr("cy", d => d.y0).attr("r", d => d.r)
+    .attr("fill", d => d.v == null ? "#D8D4CC" : D.sc(d.v)).attr("stroke", "#F7F5EE").attr("stroke-width", .25);
+  dots.append("title").text(d => title({ id: d.id }));
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll(".D .toggle button").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll(".D .toggle button").forEach(x => x.classList.toggle("on", x === b));
+    const people = b.dataset.v === "people", t = reduce ? 0 : 900;
+    D.svg.select(".land").transition().duration(t).style("opacity", people ? 0.08 : 1);
+    D.svg.select(".outline").transition().duration(t).style("opacity", people ? 0.25 : 1);
+    D.svg.select(".people").style("pointer-events", people ? "auto" : "none").transition().duration(t / 3).style("opacity", people ? 1 : 0);
+    dots.transition().duration(t).attr("cx", d => people ? d.x : d.x0).attr("cy", d => people ? d.y : d.y0);
+    document.getElementById("cap-D").textContent = people
+      ? "People view: each county is a circle sized by its population, nudged apart so none overlap."
+      : "Land view: each county drawn at its real size.";
+  }));
+
+  // ---------- E: cards with county silhouettes
+  const REGION = { // census regions -> card accent
+    "CT":0,"ME":0,"MA":0,"NH":0,"RI":0,"VT":0,"NJ":0,"NY":0,"PA":0,
+    "IL":2,"IN":2,"MI":2,"OH":2,"WI":2,"IA":2,"KS":2,"MN":2,"MO":2,"NE":2,"ND":2,"SD":2,
+    "DE":1,"DC":1,"FL":1,"GA":1,"MD":1,"NC":1,"SC":1,"VA":1,"WV":1,"AL":1,"KY":1,"MS":1,"TN":1,"AR":1,"LA":1,"OK":1,"TX":1 };
+  const accent = st => RAMPS.E[REGION[st] ?? 3];
+  function shape(fips, w = 180, h = 110) {
+    const f = counties.find(c => c.id === fips); if (!f) return "";
+    const p = d3.geoPath(d3.geoIdentity().fitExtent([[6, 6], [w - 6, h - 6]], f));
+    return `<svg viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${p(f)}" fill="var(--acc)" opacity=".9"/></svg>`;
+  }
+  const front = c => `<div class="card" style="--acc:${accent(c.state)}"><div class="inner">
+      <div class="st">${c.state} · pop. ${c.population.toLocaleString()}</div><div class="nm">${c.county}</div>
+      ${shape(c.fips)}
+      <div class="ratio">${r2(c.ratio)}</div><div class="lab">back per $1 of federal tax</div>
+      <span class="rk">#${c.rank.toLocaleString()} of ${DATA.n.toLocaleString()}</span></div></div>`;
+  const back = c => `<div class="card back" style="--acc:${accent(c.state)}"><div class="inner">
+      <h6>${c.county} · FY2023</h6><table>
+      <tr><td>Money in</td><td>${fmt$(c.money_in)}</td></tr>
+      <tr><td>&nbsp;Social Security & SSI</td><td>${fmt$(c.ss_ssi)}</td></tr>
+      <tr><td>&nbsp;Grants</td><td>${fmt$(c.grants)}</td></tr>
+      <tr><td>&nbsp;Contracts</td><td>${fmt$(c.contracts)}</td></tr>
+      <tr><td>Taxes paid (est.)</td><td>${fmt$(c.taxes_total)}</td></tr>
+      <tr><td>Money in / person</td><td>${fmt$(c.money_in_pp)}</td></tr>
+      <tr><td>Taxes / person</td><td>${fmt$(c.taxes_pp)}</td></tr>
+      <tr><td>U.S. average</td><td>${r2(US)}</td></tr></table>
+      <div class="lab" style="margin-top:8px;color:#6E6452">5-year trend: Phase 1</div></div></div>`;
+  const deal = document.getElementById("deal");
+  DATA.cards.slice().reverse().forEach((c, i, arr) => {
+    const el = document.createElement("div"); el.innerHTML = front(c); const card = el.firstElementChild;
+    const k = arr.length - 1 - i; card.style.transform = `translateX(${(k - 1) * 86}px) rotate(${(k - 1) * 7}deg)`; card.style.zIndex = 10 - Math.abs(k - 1);
+    deal.appendChild(card);
+  });
+  document.getElementById("cardpage").innerHTML = front(DATA.cards[0]) + back(DATA.cards[0]);
+});
+
+// ---------- A receipt
+const L = (l, r, cls = "") => `<div class="row ${cls}"><span class="l">${l}</span><span class="lead"></span><span class="r">${r}</span></div>`;
+document.getElementById("receipt").innerHTML = `
+  <div class="c title">FEDERAL MONEY RECEIPT</div><div class="c">${S.county.toUpperCase()}, ${S.state}</div>
+  <div class="c tiny">Fiscal year 2023 · pop. ${S.population.toLocaleString()}</div><hr>
+  ${L("Social Security & SSI", fmt$(S.ss_ssi))}${L("Grants (local)", fmt$(S.grants_county))}
+  ${L("Grants (statewide share)*", fmt$(S.grants_statewide))}${L("Contracts", fmt$(S.contracts))}<hr>
+  ${L("MONEY IN", fmt$(S.money_in), "total")}${L("per resident", fmt$(S.money_in_pp))}<hr>
+  ${L("Income tax", fmt$(S.tax_income))}${L("Payroll taxes", fmt$(S.tax_payroll))}${L("Other federal taxes*", fmt$(S.tax_other))}
+  ${L("TAXES PAID", fmt$(S.taxes_total), "total")}<hr>
+  <div class="c">DOLLARS BACK PER $1</div><div class="big">${r2(S.ratio)}</div>
+  <div class="c tiny">U.S. average ${r2(US)} · rank ${S.rank.toLocaleString()} of ${DATA.n.toLocaleString()}</div><hr>
+  <div class="tiny">* estimate. Sources: USAspending, IRS SOI, Treasury, Census.</div><div class="barcode"></div>`;
+
+// ---------- B almanac
+document.getElementById("facts").innerHTML = `
+  <h4>${S.county}, ${S.state}</h4><div class="meta">Population ${S.population.toLocaleString()} (2023)<sup>1</sup> · fiscal year 2023</div>
+  <div class="kpis"><div class="kpi"><b>${r2(S.ratio)}</b><span>back per $1 of federal tax<sup>2</sup></span></div>
+  <div class="kpi"><b>${fmt$(S.money_in_pp)}</b><span>federal money per resident<sup>3</sup></span></div></div>
+  <table><tr><th>Money in</th><th>Total</th><th>Per person</th></tr>
+  <tr><td>Social Security & SSI<sup>3</sup></td><td>${fmt$(S.ss_ssi)}</td><td>${fmt$(S.ss_ssi / S.population)}</td></tr>
+  <tr><td>Grants<sup>3,4</sup></td><td>${fmt$(S.grants)}</td><td>${fmt$(S.grants / S.population)}</td></tr>
+  <tr><td>Contracts<sup>3</sup></td><td>${fmt$(S.contracts)}</td><td>${fmt$(S.contracts / S.population)}</td></tr>
+  <tr><th>Taxes paid<sup>5</sup></th><th>${fmt$(S.taxes_total)}</th><th>${fmt$(S.taxes_pp)}</th></tr></table>
+  <span class="btn">Download CSV</span>
+  <div class="foot">1 Census Bureau. 2 U.S. average ${r2(US)}; typical county ${r2(MED)}. 3 USAspending, place of performance. 4 Includes a population-based share of statewide grants. 5 IRS SOI and Treasury; partly estimated.</div>`;
+
+// ---------- C ledger
+const maxv = Math.max(S.ss_ssi, S.grants, S.contracts, S.tax_income, S.tax_payroll, S.tax_other);
+const bar = (label, v) => `<div class="item"><div class="lbl"><span>${label}</span><span>${fmt$(v)}</span></div><div class="bar" style="width:${Math.max(2, 100 * v / maxv)}%"></div></div>`;
+document.getElementById("ledger").innerHTML = `<h4>${S.county}, ${S.state}</h4><div class="meta">Fiscal year 2023 · ${S.population.toLocaleString()} residents</div>
+  <div class="flow"><div class="in"><h5>Came in · ${fmt$(S.money_in)}</h5>${bar("Social Security", S.ss_ssi)}${bar("Grants", S.grants)}${bar("Contracts", S.contracts)}</div>
+  <div class="out"><h5>Paid out · ${fmt$(S.taxes_total)}</h5>${bar("Income tax", S.tax_income)}${bar("Payroll", S.tax_payroll)}${bar("Other", S.tax_other)}</div></div>
+  <div class="verdict"><b>${r2(S.ratio)}</b> back for every $1 paid · typical county ${r2(MED)} · U.S. average ${r2(US)}</div>`;
+
+// ---------- D atlas plate
+const sameState = Object.entries(DATA.counties).filter(([f, c]) => c[3] === S.state && c[0] != null).sort((a, b) => b[1][0] - a[1][0]);
+const stRank = sameState.findIndex(([f]) => f === S.fips) + 1;
+document.getElementById("plate").innerHTML = `<h4>${S.county}</h4><div class="meta">${S.state} · plate ${S.fips} · fiscal year 2023</div>
+  <div class="strip"><div><b>${r2(S.ratio)}</b><span>back per $1</span></div><div><b>${fmt$(S.money_in_pp)}</b><span>in per resident</span></div><div><b>${stRank} / ${sameState.length}</b><span>rank in ${S.state}</span></div></div>
+  <svg id="plate-map" viewBox="0 0 400 210" style="width:100%;height:auto"></svg>
+  <div class="caption">Every ${S.state} county as a circle sized by population and colored by dollars back; ${S.county} outlined. On the real page: locator map and "vs. the counties next door".</div>`;
+(function plateMap() {
+  const svg = d3.select("#plate-map"), sc = scaleFor("D");
+  const rows = sameState.slice().sort((a, b) => b[1][1] - a[1][1]);
+  const maxPop = rows[0][1][1];
+  const nodes = rows.map(([f, c]) => ({ f, c, r: 3 + 34 * Math.sqrt(c[1] / maxPop) }));
+  const sim = d3.forceSimulation(nodes).force("x", d3.forceX(200).strength(0.05)).force("y", d3.forceY(105).strength(0.09))
+    .force("collide", d3.forceCollide(d => d.r + 1)).stop();
+  for (let i = 0; i < 200; i++) sim.tick();
+  svg.selectAll("circle").data(nodes).join("circle").attr("cx", d => d.x).attr("cy", d => d.y).attr("r", d => d.r)
+    .attr("fill", d => sc(d.c[0])).attr("stroke", d => d.f === S.fips ? "#111" : "#F7F5EE").attr("stroke-width", d => d.f === S.fips ? 2.5 : .6)
+    .append("title").text(d => `${d.c[2]}: ${r2(d.c[0])}`);
+})();
+
+// ---------- F statement
+document.getElementById("idx").innerHTML = DATA.states.map((s, i) => {
+  const max = DATA.states[0][1];
+  return `<div><span>${s[0]}</span><i style="width:${100 * s[1] / max}%"></i><span>${r2(s[1])}</span></div>`;
+}).join("");
+const P = `<span class="pending">Phase 1</span>`;
+const srow = (l, v) => `<tr><td>${l}</td><td>${fmt$(v)}</td><td>${P}</td><td>${P}</td></tr>`;
+document.getElementById("stmt").innerHTML = `
+  <div class="hd"><div><b>Federal money statement</b>${S.county}, ${S.state}</div><div style="text-align:right"><span>Period: Oct 1, 2022 – Sep 30, 2023</span><br><span>Data as of Oct 6, 2026</span></div></div>
+  <div class="box"><div><span>Money in</span><b>${fmt$(S.money_in)}</b></div><div><span>Taxes paid (est.)</span><b>${fmt$(S.taxes_total)}</b></div><div><span>Back per $1</span><b>${r2(S.ratio)}</b></div></div>
+  <table><tr><th>Item</th><th>This year</th><th>5-yr avg</th><th>Change</th></tr>
+  <tr class="sec"><td colspan="4">Benefits</td></tr>${srow("Social Security & SSI", S.ss_ssi)}
+  <tr class="sec"><td colspan="4">Grants</td></tr>${srow("Tagged to the county", S.grants_county)}${srow("Statewide share (est.)", S.grants_statewide)}
+  <tr class="sec"><td colspan="4">Contracts</td></tr>${srow("Contracts", S.contracts)}
+  <tr class="sec"><td colspan="4">Taxes paid</td></tr>${srow("Income tax", S.tax_income)}${srow("Payroll taxes", S.tax_payroll)}${srow("Other (est.)", S.tax_other)}
+  <tr class="sec"><td colspan="4">Adjustments: cancellations and money taken back</td></tr>
+  <tr><td colspan="4" class="pending" style="text-align:left;font-family:'Libre Franklin'">Listed here with dates once Phase 1 reads the monthly change files.</td></tr></table>`;
+
+// ---------- G explorer panel
+const above = sameState.slice(Math.max(0, stRank - 3), stRank + 2);
+const maxR = sameState[0][1][0];
+document.getElementById("panel").innerHTML = `<h4>${S.county}</h4><div class="meta">${S.state} · ${S.population.toLocaleString()} residents · FY2023</div>
+  <div class="stat"><span>Dollars back per $1</span><b>${r2(S.ratio)}</b></div>
+  <div class="stat"><span>Money in per person</span><b>${fmt$(S.money_in_pp)}</b></div>
+  <div class="stat"><span>Taxes per person (est.)</span><b>${fmt$(S.taxes_pp)}</b></div>
+  <div class="stat"><span>Social Security share of money in</span><b>${Math.round(100 * S.ss_ssi / S.money_in)}%</b></div>
+  <div class="stat"><span>Rank in ${S.state}</span><b>${stRank} of ${sameState.length}</b></div>
+  <div class="rank">${above.map(([f, c]) => `<div class="${f === S.fips ? "me" : ""}"><span>${c[2].replace(" County", "")}</span><i style="width:${100 * c[0] / maxR}%"></i><span>${r2(c[0])}</span></div>`).join("")}</div>
+  <div class="pin">+ Pin to compare (up to 3)</div>`;
+</script>
+</body>
+</html>

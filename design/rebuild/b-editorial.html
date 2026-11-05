@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Federal Money Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* Iteration B · Editorial: one calm reading column, list rows with right-aligned values; the map breaks out wider. */
+.top{display:flex;align-items:center;gap:24px;max-width:1040px;margin:0 auto;padding:28px 24px}
+.brand{font:700 12px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;text-decoration:none}
+nav{margin-left:auto;display:flex;gap:22px}
+nav a{font:600 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--mute);padding:8px 0;border-bottom:2px solid transparent}
+nav a[aria-current="page"]{color:var(--ink);border-color:var(--ink)}
+main{max-width:1040px;margin:0 auto;padding:8px 24px 80px}
+.col{max-width:720px;margin-left:auto;margin-right:auto}
+h1{font:800 clamp(38px,6vw,64px)/1 var(--sans);letter-spacing:-.045em;margin:16px 0 0}
+h2.t{font:700 22px/1.2 var(--sans);letter-spacing:-.02em;margin:0}
+.lead{font:400 20px/1.5 var(--sans);color:var(--mute);margin:16px 0 0}
+.lead b{color:var(--ink);font-weight:600}
+.small{font-size:13px;color:var(--mute);margin:0}
+.block{margin-top:64px}
+.block>.label{display:block;margin-bottom:16px}
+.search{margin-top:32px}
+.search input{width:100%;font:500 19px var(--sans);padding:16px 18px;border:1.5px solid var(--ink)!important;background:var(--white)}
+.rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
+.rows li{border-bottom:1px solid var(--line)}
+.rows .r{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:16px 0;text-decoration:none}
+.rows .r .n{font:600 18px/1.3 var(--sans);letter-spacing:-.01em}
+.rows .r .n small{display:block;font:400 14px var(--sans);color:var(--mute);margin-top:4px;letter-spacing:0}
+.rows .r .v{font:600 15px var(--mono);white-space:nowrap}
+.rows .r .v.big{font:800 28px/1 var(--sans);letter-spacing:-.03em}
+.rows a.r:hover .n{text-decoration:underline}
+.rows li.me .n{font-weight:800}
+/* map */
+.mapblock{margin-top:48px;border-top:1px solid var(--ink);padding-top:16px}
+.toolbar{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;margin-bottom:12px}
+.toolbar h2{flex:1 1 260px}
+.toolbar label{font-size:14px;color:var(--mute);display:flex;align-items:center;gap:8px}
+.toolbar select{height:40px;padding:0 10px;border:1px solid;background:var(--white);font-size:15px;color:var(--ink)}
+.seg{display:inline-flex;border:1px solid var(--ink)}
+.seg button{border:0;background:transparent;padding:0 14px;height:38px;font:600 13px var(--sans);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.textlink{display:inline-block;margin-top:12px;font:600 14px var(--sans);text-decoration:none;border-bottom:1.5px solid var(--ink)}
+/* county */
+.giantrow{display:flex;align-items:flex-end;gap:24px;margin:32px 0 0;padding:24px 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.giant{font:800 clamp(80px,14vw,140px)/.85 var(--sans);letter-spacing:-.06em;margin:0}
+.giantrow .side{padding-bottom:8px}
+.giantrow .side b{display:block;font:700 18px var(--sans)}
+.bar{margin:16px 0 0}
+.bar .t2{display:flex;justify-content:space-between;font-size:16px}
+.bar .t2 b{font:600 16px var(--mono)}
+.bar .track{height:14px;background:#E8E8E8;margin-top:8px;overflow:hidden}
+.bar .fill{height:100%}
+.est{font:600 10px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);border:1px solid var(--faint);padding:1px 4px;margin-left:6px;vertical-align:2px}
+.links{display:flex;gap:28px;flex-wrap:wrap}
+.links a,.links button{all:unset;cursor:pointer;font:600 14px var(--sans);border-bottom:1.5px solid var(--ink);padding-bottom:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.filters input,.filters select{height:42px;padding:0 12px;border:1px solid;background:var(--white);font-size:15px}
+.filters input{flex:1 1 200px}
+.linkbtn{all:unset;cursor:pointer;font:600 14px var(--sans);border-bottom:1.5px solid var(--ink);padding-bottom:2px;margin-top:24px;display:inline-block}
+/* compare */
+.cmp{border-top:1px solid var(--ink)}
+.cmp .row{display:grid;grid-template-columns:200px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);align-items:center}
+.cmp .row .k{font-size:14px;color:var(--mute)}
+.cmp .vals{display:flex;flex-direction:column;gap:8px}
+.cmp .vals div{display:grid;grid-template-columns:150px 1fr 70px;gap:12px;align-items:center;font-size:14px}
+.cmp .vals i{display:block;height:8px;background:var(--faint)}
+.cmp .vals b{font-family:var(--mono);font-weight:600;text-align:right}
+.chiprow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:24px}
+.pin{display:inline-flex;gap:10px;align-items:center;border:1px solid var(--ink);padding:6px 10px;font-weight:600}
+.pin button{all:unset;cursor:pointer;color:var(--mute);font-size:18px;line-height:1;padding:0 2px}
+.prose p{font-size:17px;line-height:1.65;margin:0 0 16px}
+.prose h2{font:700 22px/1.2 var(--sans);letter-spacing:-.02em;margin:40px 0 10px}
+.foot{font-size:13px;color:var(--mute);margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+@media (max-width:640px){
+  .top{flex-wrap:wrap;gap:12px;padding:16px}nav{margin-left:0;gap:18px;width:100%}
+  main{padding:4px 16px 60px}
+  .mapblock{margin-left:-16px;margin-right:-16px;padding-left:0;padding-right:0}
+  .mapblock .toolbar,.mapblock .fm-legend,.mapblock .textlink,.mapblock .small{margin-left:16px;margin-right:16px}
+  .two{grid-template-columns:1fr}.block{margin-top:48px}
+  .cmp .row{grid-template-columns:1fr}.cmp .vals div{grid-template-columns:110px 1fr 64px}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top no-print">
+  <a class="brand" href="#/">Federal Money Atlas</a>
+  <nav aria-label="Main"><a href="#/" data-nav="home">Map</a><a href="#/list" data-nav="list">Counties</a><a href="#/compare" data-nav="compare">Compare</a><a href="#/about" data-nav="about">About</a></nav>
+</header>
+<main id="main" tabindex="-1">
+
+<!-- HOME -->
+<section data-view="home" aria-labelledby="h-home">
+  <div class="col">
+    <p class="label">Fiscal year 2023 · 3,144 counties</p>
+    <h1 id="h-home">How much federal money comes back to your county?</h1>
+    <p class="lead">For every <b>$1</b> of federal taxes a county's residents paid, see how much came back as Social Security, grants and contracts.</p>
+    <div class="search"><label class="sr" for="q-home">Find your county</label><input id="q-home" placeholder="Find your county — e.g. Franklin, OH"></div>
+  </div>
+  <section class="mapblock" aria-labelledby="map-title">
+    <div class="toolbar">
+      <h2 class="t" id="map-title"></h2>
+      <label>Showing <select id="kind"></select></label>
+      <label>Counties <select id="size"></select></label>
+      <div class="seg" role="group" aria-label="Map view" id="views"></div>
+    </div>
+    <div id="map"></div>
+    <div id="legend"></div>
+    <a class="textlink" id="as-list" href="#/list">View this as a list →</a>
+  </section>
+  <div class="col">
+    <section class="block" aria-labelledby="l-short"><h2 class="label" id="l-short">The short answer</h2>
+      <ul class="rows">
+        <li><div class="r"><span class="n">Typical county<small>Half of counties get more back per $1, half get less</small></span><span class="v big" id="v-med"></span></div></li>
+        <li><div class="r"><span class="n">U.S. overall<small>Every county added up — lower, because a few high-income places pay much of the tax</small></span><span class="v big" id="v-us"></span></div></li>
+        <li><a class="r" href="#/about"><span class="n">What's counted and what's estimated<small>Social Security, grants and contracts; some grants and taxes are estimated</small></span><span class="v" aria-hidden="true">→</span></a></li>
+      </ul></section>
+    <section class="block" aria-labelledby="l-start"><h2 class="label" id="l-start">Start with a county</h2><ul class="rows" id="examples"></ul></section>
+  </div>
+</section>
+
+<!-- COUNTY -->
+<section data-view="county" hidden id="county" class="col"></section>
+
+<!-- LIST -->
+<section data-view="list" hidden aria-labelledby="h-list" class="col">
+  <p class="label">All counties</p><h1 id="h-list">Every county</h1>
+  <div class="block" style="margin-top:32px">
+    <div class="filters">
+      <label class="sr" for="l-q">Filter by name</label><input id="l-q" placeholder="Filter by name">
+      <label class="sr" for="l-st">State</label><select id="l-st"><option value="">All states</option></select>
+      <label class="sr" for="l-sz">Size</label><select id="l-sz"></select>
+      <label class="sr" for="l-k">Money shown</label><select id="l-k"></select>
+      <label class="sr" for="l-sort">Sort</label><select id="l-sort"><option value="pop">Most residents</option><option value="hi">Most back per $1</option><option value="lo">Least back per $1</option><option value="name">A–Z</option></select>
+    </div>
+    <p class="small" id="l-n" aria-live="polite" style="margin-bottom:12px"></p>
+    <ul class="rows" id="l-rows"></ul><button class="linkbtn" id="l-more">Show 50 more</button>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section data-view="compare" hidden aria-labelledby="h-cmp" class="col">
+  <p class="label">Compare</p><h1 id="h-cmp">Side by side</h1>
+  <p class="lead">Up to three counties.</p>
+  <div class="chiprow" id="pins"></div>
+  <div class="block" style="margin-top:32px" id="cmp"></div>
+  <button class="linkbtn" id="copy">Copy link to this comparison</button>
+</section>
+
+<!-- ABOUT -->
+<section data-view="about" hidden aria-labelledby="h-about" class="col"><div class="prose">
+  <p class="label">About</p><h1 id="h-about">What this measures</h1>
+  <p class="lead" style="margin-bottom:32px">A prototype, not yet published. Numbers come from public data for fiscal year 2023.</p>
+  <h2>Money that came back</h2><p>Federal contracts, grants, and Social Security &amp; SSI that agencies committed in fiscal year 2023 for work or payments in each county, from USAspending.gov.</p>
+  <h2>Taxes residents paid</h2><p>Income tax comes from IRS county data. Payroll, corporate, estate and excise taxes are estimated from wages, investment income and population, then scaled to the U.S. Treasury's totals.</p>
+  <h2>Typical county vs. U.S. overall</h2><p>The typical county ($1.09) is the one in the middle. The U.S. overall figure ($0.74) adds up every county; it is lower because a few high-income places pay much of the tax. County pages compare with the typical county.</p>
+  <h2>What's estimated</h2><p>Medicaid and other statewide grants have no county, so each county gets a share based on population. These are marked <span class="est">est.</span></p>
+  <h2>Why the U.S. figure is under $1</h2><p>Medicare, veterans' payments, federal salaries, defense overhead and interest on the debt aren't tied to a county here.</p>
+  <h2>Three map views</h2><p><b>Land</b> shows counties at real size. <b>People</b> sizes each county by its residents. <b>Grid</b> combines nearby counties into equal squares. Connecticut reports 9 planning regions and isn't drawn yet.</p>
+</div></section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="data.js"></script>
+<script src="core.js"></script>
+<script>
+const $ = s => document.querySelector(s), go = f => location.hash = "#/county/" + f;
+let map; const H = { kind: "all", size: "all", view: "land" };
+$("#v-us").textContent = FM.r2(FM.US); $("#v-med").textContent = FM.r2(FM.MED);
+FM.combobox($("#q-home"), c => go(c.fips));
+$("#kind").innerHTML = Object.entries(FM.KINDS).map(([k, d]) => `<option value="${k}">${d.label} (${FM.r2(FM.usPer(k))} U.S.)</option>`).join("");
+$("#size").innerHTML = Object.entries(FM.SIZES).map(([k, d]) => `<option value="${k}">${d.label} (${FM.int(d.count)})</option>`).join("");
+$("#views").innerHTML = [["land", "Land"], ["people", "People"], ["grid", "Grid"]].map(([v, l]) => `<button data-v="${v}">${l}</button>`).join("");
+$("#kind").onchange = e => { H.kind = e.target.value; update(); };
+$("#size").onchange = e => { H.size = e.target.value; update(); };
+document.querySelectorAll("#views button").forEach(b => b.onclick = () => { H.view = b.dataset.v; update(); });
+function update() {
+  document.querySelectorAll("#views button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === H.view));
+  $("#map-title").textContent = `${FM.KINDS[H.kind].short} back per $1 of tax`;
+  $("#legend").innerHTML = FM.legendHTML(H.kind, H.size);
+  $("#as-list").href = FM.listURL({ kind: H.kind, size: H.size, sort: "hi" });
+  if (map) map.set({ kind: H.kind, size: H.size, view: H.view });
+}
+const row = (c, sub, v) => `<li><a class="r" href="#/county/${c.fips}"><span class="n">${FM.esc(c.name)}, ${c.st}<small>${sub}</small></span><span class="v">${FM.r2(v === undefined ? c.ratio : v)}</span></a></li>`;
+$("#examples").innerHTML = ["39049", "54047", "06081", "48201"].map(f => row(FM.C[f], `${FM.int(FM.C[f].pop)} residents · ${FM.vsTypical(FM.C[f])} the typical county`)).join("");
+
+function county(fips) {
+  const c = FM.C[fips], el = $("#county");
+  if (!c) { el.innerHTML = `<h1>County not found</h1><p class="lead">Try the search on the <a href="#/">map page</a> or browse <a href="#/list">every county</a>.</p>`; return; }
+  const ok = FM.hasRatio(c), sr = FM.stateRank(c), max = Math.max(c.money, c.taxes, 1), pp = v => FM.whole(v / c.pop), caution = FM.caution(c);
+  const nbs = [c, ...FM.neighbors(c)].filter(x => FM.hasRatio(x)).sort((a, b) => b.ratio - a.ratio);
+  const item = (n, sub, v, est) => `<li><div class="r"><span class="n">${n}${est ? '<span class="est">est.</span>' : ""}<small>${sub}</small></span><span class="v">${FM.money(v)}</span></div></li>`;
+  el.innerHTML = `
+    <p class="label"><a href="#/" style="text-decoration:none">Map</a> / <a href="#/list" style="text-decoration:none">Counties</a> / ${FM.esc(FM.stName(c.st))}</p>
+    <h1>${FM.esc(c.name)}</h1>
+    <p class="lead">${FM.esc(FM.sentence(c))}</p>
+    ${caution ? `<p class="fm-caution"><b>Note</b><span>${FM.esc(caution)}</span></p>` : ""}
+    <div class="giantrow"><p class="giant">${ok ? FM.r2(c.ratio) : "—"}</p>
+      <div class="side"><b>back per $1 of federal tax</b><span class="small">${ok ? `Typical county ${FM.r2(FM.MED)} · #${FM.int(FM.rank(c))} of ${FM.int(FM.N)} (1 = most back)${sr ? ` · ${sr.r} of ${sr.n} in ${FM.esc(FM.stName(c.st))}` : ""}` : "Not reported (counted with a neighboring county)"}</span></div></div>
+    ${ok ? `<section class="block" style="margin-top:40px" aria-labelledby="l-pv"><h2 class="label" id="l-pv">Paid vs. came back · fiscal year ${FM.FY}</h2>
+      <div class="bar"><div class="t2"><span>Federal money that came back</span><b>${FM.money(c.money)}</b></div><div class="track"><div class="fill" style="width:${100 * Math.max(0, c.money) / max}%;background:var(--green)"></div></div></div>
+      <div class="bar"><div class="t2"><span>Federal taxes residents paid</span><b>${FM.money(c.taxes)}</b></div><div class="track"><div class="fill" style="width:${100 * c.taxes / max}%;background:var(--ink)"></div></div></div>
+      <p class="small" style="margin-top:16px">Per resident, ${pp(c.money)} came back and ${pp(c.taxes)} was paid. Taxes other than income tax are estimated.</p></section>` : ""}
+    <section class="block" aria-labelledby="l-where"><h2 class="label" id="l-where">Where the money came from</h2><ul class="rows">
+      ${item("Social Security & SSI", `${pp(c.ss)} per resident`, c.ss)}
+      ${item("Grants", `Includes ${FM.money(c.gs)} as a share of statewide programs like Medicaid`, c.gr, true)}
+      ${item("Contracts", `Work done in the county · ${pp(c.con)} per resident`, c.con)}</ul></section>
+    <section class="block" aria-labelledby="l-nb"><h2 class="label" id="l-nb">Next door · back per $1</h2>
+      <div class="two"><ul class="rows">${nbs.map(x => `<li class="${x === c ? "me" : ""}"><a class="r" href="#/county/${x.fips}"><span class="n">${FM.esc(x.short)}${x === c ? " (this county)" : x.st !== c.st ? ", " + x.st : ""}</span><span class="v">${FM.r2(x.ratio)}</span></a></li>`).join("")}</ul>
+      <svg id="nbmap" style="width:100%;height:auto;display:block" role="img" aria-label="Map of ${FM.esc(c.name)} and neighboring counties"></svg></div></section>
+    <section class="block" aria-labelledby="l-more"><h2 class="label" id="l-more">More</h2>
+      <div class="links"><button id="csv">Download CSV</button><a href="#/compare?pins=${c.fips}">Compare</a><a href="#/about">How it's measured</a></div></section>
+    <p class="foot">${FM.int(c.pop)} residents · data as of ${FM.ASOF} · Sources: USAspending.gov, IRS, U.S. Treasury, Census Bureau.</p>`;
+  $("#csv").onclick = () => FM.downloadCSV(c);
+  FM.neighborMap($("#nbmap"), c, go);
+}
+
+let LP, LN = 50;
+$("#l-st").innerHTML += FM.stateOptions();
+$("#l-sz").innerHTML = Object.entries(FM.SIZES).map(([k, d]) => `<option value="${k}">${d.label}</option>`).join("");
+$("#l-k").innerHTML = Object.entries(FM.KINDS).map(([k, d]) => `<option value="${k}">${d.label}</option>`).join("");
+["#l-q", "#l-st", "#l-sz", "#l-k", "#l-sort"].forEach(s => $(s).addEventListener("input", () => { LN = 50;
+  LP = { q: $("#l-q").value, st: $("#l-st").value, size: $("#l-sz").value, kind: $("#l-k").value, sort: $("#l-sort").value };
+  history.replaceState(null, "", FM.listURL(LP)); drawList(); }));
+$("#l-more").onclick = () => { LN += 50; drawList(); };
+function list(_, p) { LP = FM.listParams(p); $("#l-q").value = LP.q; $("#l-st").value = LP.st; $("#l-sz").value = LP.size; $("#l-k").value = LP.kind; $("#l-sort").value = LP.sort; LN = 50; drawList(); }
+function drawList() {
+  const rows = FM.listRows(LP), k = FM.KINDS[LP.kind].short;
+  $("#l-n").textContent = `${FM.int(rows.length)} counties · ${k} back per $1`;
+  $("#l-rows").innerHTML = rows.slice(0, LN).map(({ c, v }) => row(c, `${FM.esc(FM.stName(c.st))} · ${FM.int(c.pop)} residents`, v)).join("");
+  $("#l-more").hidden = rows.length <= LN;
+}
+
+$("#copy").onclick = e => FM.copyLink(e.currentTarget);
+function compare(_, p) {
+  const pins = (p.get("pins") || "").split(",").filter(f => FM.C[f]).slice(0, 3), set = l => location.hash = "#/compare?pins=" + l.join(",");
+  $("#pins").innerHTML = pins.map((f, i) => `<span class="pin">${FM.esc(FM.C[f].short)}, ${FM.C[f].st}<button data-i="${i}" aria-label="Remove ${FM.esc(FM.C[f].name)}">×</button></span>`).join("") +
+    (pins.length < 3 ? `<div class="search" style="margin:0;flex:1 1 240px"><label class="sr" for="cmp-add">Add a county to compare</label><input id="cmp-add" placeholder="${pins.length ? "Add another county" : "Add a county"}" style="font-size:16px;padding:10px 12px"></div>` : "");
+  const add = $("#cmp-add"); if (add) FM.combobox(add, c => set([...pins.filter(x => x !== c.fips), c.fips].slice(0, 3)));
+  document.querySelectorAll("#pins button").forEach(b => b.onclick = () => { set(pins.filter((_, i) => i !== +b.dataset.i)); setTimeout(() => { const n = $("#cmp-add"); n && n.focus(); }, 50); });
+  const cs = pins.map(f => FM.C[f]);
+  const metric = (label, get, fmt) => { const vals = cs.map(get), mx = Math.max(...vals.map(v => Math.abs(v || 0)), 1e-9);
+    return `<div class="row"><span class="k">${label}</span><div class="vals">${cs.map((c, i) => `<div><span>${FM.esc(c.short)}</span><i style="width:${100 * Math.max(0, vals[i] || 0) / mx}%;${label.startsWith("Back") ? "background:var(--green)" : label.startsWith("Taxes") ? "background:var(--ink)" : ""}" aria-hidden="true"></i><b>${fmt(vals[i])}</b></div>`).join("")}</div></div>`; };
+  $("#cmp").innerHTML = cs.length ? `<div class="cmp">${metric("Back per $1 of tax", c => c.ratio, FM.r2)}${metric("Money in per person", c => c.money / c.pop, FM.whole)}${metric("Taxes per person", c => c.taxes / c.pop, FM.whole)}${metric("Social Security per $1", c => FM.perDollar("ss", c), FM.r2)}${metric("Residents", c => c.pop, FM.int)}</div>` : `<p class="small">Add a county to start.</p>`;
+}
+
+update();
+FM.loadGeometry().then(() => { map = FM.makeMap($("#map"), {}); update(); FM.route({ county, list, compare }); });
+</script>
+</body>
+</html>

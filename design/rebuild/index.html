@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three Rebuilt Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+.top{display:flex;align-items:center;gap:24px;max-width:1280px;margin:0 auto;padding:24px}
+.brand{font:700 12px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase}
+nav{margin-left:auto;display:flex;gap:24px}
+nav a{font:600 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--mute)}
+nav a:hover{color:var(--ink)}
+main{max-width:1280px;margin:0 auto;padding:0 24px 80px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.grid+.grid{border-top:0}
+.cell{background:var(--bg);padding:32px;min-width:0}
+.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s12{grid-column:span 12}
+.white{background:var(--white)}.green{background:var(--green)}
+h1{font:800 clamp(40px,6vw,76px)/.98 var(--sans);letter-spacing:-.05em;margin:12px 0 0}
+h2.t{font:800 clamp(26px,3vw,36px)/1.05 var(--sans);letter-spacing:-.035em;margin:8px 0 0}
+h3{font:600 18px/1.3 var(--sans);letter-spacing:-.01em;margin:0 0 8px}
+p{margin:0}
+.lead{font:500 19px/1.5 var(--sans);margin-top:18px;max-width:760px}
+.small{font-size:14px;color:var(--mute);line-height:1.55}
+.giant{font:800 clamp(48px,6vw,80px)/.9 var(--sans);letter-spacing:-.05em}
+section{margin-top:56px}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+/* iteration cards */
+.screen{position:relative;border:1px solid var(--ink);background:var(--white);aspect-ratio:4/3;overflow:hidden;margin-top:20px}
+.screen iframe{position:absolute;top:0;left:0;width:1200px;height:900px;border:0;transform-origin:0 0;pointer-events:none}
+.screen a{position:absolute;inset:0}
+.tabs{display:flex;gap:0;margin-top:12px;border:1px solid var(--ink);width:max-content;max-width:100%;flex-wrap:wrap}
+.tabs button{border:0;background:transparent;padding:0 12px;height:34px;font:600 11px var(--sans);letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.open{display:inline-block;margin-top:16px;font:600 14px var(--sans);text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:2px}
+ul.pm{list-style:none;margin:16px 0 0;padding:0}
+ul.pm li{padding:8px 0;border-top:1px solid var(--line);font-size:14px;display:grid;grid-template-columns:60px 1fr;gap:10px}
+ul.pm li b{font:600 11px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);padding-top:2px}
+/* scores */
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--white)}
+th,td{padding:14px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font:600 11px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);border-bottom:1px solid var(--ink)}
+td.n{font:600 15px var(--mono)}
+.fixes{columns:2;column-gap:32px;margin:0;padding:0;list-style:none}
+.fixes li{break-inside:avoid;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.fixes li b{display:block;font-weight:700;margin-bottom:2px}
+.foot{font-size:13px;color:var(--mute);padding:24px 0}
+@media (max-width:980px){.s3,.s4,.s5{grid-column:span 6}.s6,.s7,.s8{grid-column:span 12}.it{grid-column:span 12}}
+@media (max-width:640px){.top{flex-wrap:wrap;padding:16px}nav{margin-left:0;width:100%;gap:16px}main{padding:0 16px 60px}.cell{padding:24px 18px}.s3,.s4,.s5,.s6{grid-column:span 12}.fixes{columns:1}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <span class="brand">Federal Money Atlas · Design review</span>
+  <nav aria-label="Iterations"><a href="a-bento.html">A · Bento</a><a href="b-editorial.html">B · Editorial</a><a href="c-search.html">C · Search-first</a></nav>
+</header>
+<main id="main" tabindex="-1">
+  <div class="grid">
+    <div class="cell s8 white"><p class="label">Visual rebuild · prototype · not published</p>
+      <h1>Three cleaner ways to show one answer.</h1>
+      <p class="lead">The last version had too much on every screen and no clear place to start. Each direction below rebuilds every page — map, county, list, compare and about — in the style of nader.io: light gray, near-black type, Inter, and one signal green.</p></div>
+    <div class="cell s4 green"><p class="label" style="color:var(--ink)">The one question</p>
+      <p class="giant" style="margin-top:16px">$1 in,<br>$? back.</p>
+      <p style="margin-top:12px;font-weight:600">For every $1 a county's residents pay in federal taxes, how much federal money comes back?</p></div>
+  </div>
+  <div class="grid">
+    <div class="cell s3"><p class="label">Color</p><h3 style="margin-top:8px">Green = money that came back</h3><p class="small">Black = taxes paid. Everything else is gray. Green is never used for rankings or decoration.</p></div>
+    <div class="cell s3"><p class="label">Type</p><h3 style="margin-top:8px">Inter + JetBrains Mono</h3><p class="small">Heavy, tightly spaced headlines; small spaced-out labels; mono only for figures.</p></div>
+    <div class="cell s3"><p class="label">Kept</p><h3 style="margin-top:8px">Land · People · Grid, filters, neighbors</h3><p class="small">The itemized table became three headline numbers and a CSV download.</p></div>
+    <div class="cell s3"><p class="label">Checked</p><h3 style="margin-top:8px">3 independent reviews</h3><p class="small">Usability, accessibility (WCAG 2.2 AA) and visual design. Their fixes are already applied.</p></div>
+  </div>
+
+  <section aria-labelledby="h-it">
+    <div class="sechead"><h2 class="t" id="h-it">The three iterations</h2><p class="small">Live previews with real fiscal 2023 data. Switch the page under each one.</p></div>
+    <div class="grid" id="its"></div>
+  </section>
+
+  <section aria-labelledby="h-rev">
+    <div class="sechead"><h2 class="t" id="h-rev">What the reviewers said</h2><p class="small">Scores are from before the fixes below.</p></div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th scope="col">Reviewer</th><th scope="col">A · Bento</th><th scope="col">B · Editorial</th><th scope="col">C · Search-first</th><th scope="col">Their pick</th></tr></thead>
+      <tbody>
+        <tr><th scope="row" style="font:600 15px var(--sans);text-transform:none;letter-spacing:0;color:var(--ink)">First-time usability</th><td class="n">5 / 10</td><td class="n">7 / 10</td><td class="n">7.5 / 10</td><td><b>C</b> — the clearest place to start</td></tr>
+        <tr><th scope="row" style="font:600 15px var(--sans);text-transform:none;letter-spacing:0;color:var(--ink)">Visual design: clean &amp; modern</th><td class="n">7 / 10</td><td class="n">8 / 10</td><td class="n">8 / 10</td><td rowspan="2"><b>A</b> — the only one that truly looks like nader.io</td></tr>
+        <tr><th scope="row" style="font:600 15px var(--sans);text-transform:none;letter-spacing:0;color:var(--ink)">Visual design: nader.io fidelity</th><td class="n">8 / 10</td><td class="n">6 / 10</td><td class="n">4 / 10</td></tr>
+        <tr><th scope="row" style="font:600 15px var(--sans);text-transform:none;letter-spacing:0;color:var(--ink)">Accessibility (WCAG 2.2 AA)</th><td colspan="3">No blockers. Main issues in all three: keyboard focus lost after filter clicks, faint map colors, missing headings, faint input borders.</td><td>—</td></tr>
+      </tbody></table></div>
+  </section>
+
+  <section aria-labelledby="h-fix">
+    <div class="sechead"><h2 class="t" id="h-fix">Fixed after review</h2></div>
+    <div class="grid"><div class="cell s12 white"><ul class="fixes">
+      <li><b>Search finds the right county</b>“Washington, OH”, “washington county ohio”, “saint louis” and misspellings like “mcdowl” now work; no-match offers the list.</li>
+      <li><b>One comparison, one format</b>County pages compare only with the typical county ($1.09); every figure is in dollars ($0.74, not 74¢).</li>
+      <li><b>Plain warnings for outliers</b>Counties driven by one big contract, base or lab say so next to the number (e.g. Chattahoochee, GA: 15.5× the typical county).</li>
+      <li><b>No fake zeros</b>Kalawao, HI (taxes counted with Maui) shows “not reported” instead of $0.</li>
+      <li><b>Green means money in, only</b>Removed green from rank tiles, compare cards, chips and links.</li>
+      <li><b>Readable map colors</b>Five greens without a near-black step, each swatch labeled with its range, hatching for no data, white for counties outside the size filter.</li>
+      <li><b>Results next to the map</b>Clicking a county or square opens a panel on the map with a close button; squares say how many counties match the filter.</li>
+      <li><b>A text version of the map</b>“View this as a list” opens the list with the same money type and size filter, sorted.</li>
+      <li><b>Keyboard and screen readers</b>Focus stays on filter buttons, visible focus rings everywhere, headings for every section, page titles per view, search results announced.</li>
+      <li><b>Layout fixes</b>A: one focal point on the home page. B: map moved up, filters on one line. C: square corners, no shadows, plain nav with its own Map link.</li>
+      <li><b>Compare</b>“Copy link” button, a consistent “Social Security per $1” measure, and B adds bars per row.</li>
+      <li><b>Phones</b>Question and search first; no sideways scrolling on any of the 15 pages at 375px.</li>
+    </ul></div></div>
+  </section>
+
+  <section aria-labelledby="h-rec">
+    <div class="grid">
+      <div class="cell s5 green"><p class="label" style="color:var(--ink)">Recommendation</p><h2 class="t" id="h-rec" style="margin-top:12px">A's grid, with C's way in.</h2></div>
+      <div class="cell s7 white"><p class="lead" style="margin-top:0">The reviewers split: the design reviewer picked A because it actually looks like nader.io; the usability reviewer picked C because it's clearest where to start. The natural merge is A's hairline grid and county page, opening with C's single big search and “Try” examples — and B's calm list rows for the Counties page.</p>
+        <p class="small" style="margin-top:14px">Not verified yet: real screen-reader testing (VoiceOver/NVDA), and tests with people who haven't seen the site. Connecticut is still missing from the map.</p></div>
+    </div>
+  </section>
+  <p class="foot">Built with real Phase 0 data (fiscal year 2023, 3,144 counties). Sources: USAspending.gov, IRS Statistics of Income, U.S. Treasury, Census Bureau. Design reference: nader.io.</p>
+</main>
+<script>
+const ITS = [
+  ["a-bento.html", "A · Bento", "Tile grid, giant numbers", "nader.io's hairline grid: each tile holds one idea; the home page is a question, a search box and the typical-county number.", "Closest to nader.io; one strong focal point per tile.", "Most tiles to scan; needs discipline as features grow."],
+  ["b-editorial.html", "B · Editorial", "One calm column", "A reading column with nader-style list rows; the map breaks out wider right after the search box.", "Calmest and easiest to read; great list pages.", "Feels less like nader.io; long scroll on phones."],
+  ["c-search.html", "C · Search-first", "One search, one answer", "The home page is just the question and a big search box; each county is a single answer card. The map is its own page.", "Clearest place to start; best on phones.", "Least like nader.io; the map is one step away."],
+];
+const PAGES = [["", "Home"], ["#/county/39049", "County"], ["#/list", "List"], ["#/compare?pins=39049,13053,06081", "Compare"]];
+document.getElementById("its").innerHTML = ITS.map(([f, name, tag, desc, plus, minus], i) => `
+  <div class="cell s4 it ${i === 0 ? "white" : ""}"><p class="label">${tag}</p><h3 style="font:800 26px/1.1 var(--sans);letter-spacing:-.03em;margin:8px 0 10px">${name}</h3><p class="small">${desc}</p>
+    <div class="tabs" role="group" aria-label="Preview page for ${name}">${PAGES.map(([h, l], k) => `<button aria-pressed="${k === 0}" data-i="${i}" data-h="${h}">${l}</button>`).join("")}</div>
+    <div class="screen"><iframe title="${name} preview" src="${f}" tabindex="-1"></iframe><a href="${f}" aria-label="Open ${name}"></a></div>
+    <ul class="pm"><li><b>Best</b><span>${plus}</span></li><li><b>Watch</b><span>${minus}</span></li></ul>
+    <a class="open" href="${f}">Open ${name} →</a></div>`).join("");
+const fit = () => document.querySelectorAll(".screen").forEach(s => s.querySelector("iframe").style.transform = `scale(${s.clientWidth / 1200})`);
+addEventListener("resize", fit); fit();
+document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
+  const i = +b.dataset.i, [f] = ITS[i], card = b.closest(".cell");
+  card.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  const fr = card.querySelector("iframe"); fr.contentWindow.location.hash = b.dataset.h || "#/";
+  card.querySelector(".screen a").href = f + b.dataset.h; card.querySelector(".open").href = f + b.dataset.h;
+});
+</script>
+</body>
+</html>

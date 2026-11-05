@@ -1,0 +1,3 @@
+contracts: 7 CSV files in FY2023_All_Contracts_Full_20261006.zip
+  columns used: {'obligation': 'federal_action_obligation', 'agency': 'awarding_agency_name', 'award_type': 'award_type_code', 'pop_country': 'primary_place_of_performance_country_code', 'pop_state': 'primary_place_of_performance_state_code', 'pop_state_name': 'primary_place_of_performance_state_name', 'pop_county': 'prime_award_transaction_place_of_performance_county_fips_code', 'rcp_country': 'recipient_country_code', 'rcp_state': 'recipient_state_code', 'rcp_county': 'prime_award_transaction_recipient_county_fips_code'}
+  6,693,834 transactions read
