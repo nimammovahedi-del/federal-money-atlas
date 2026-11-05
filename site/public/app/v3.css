@@ -220,7 +220,7 @@ nav.main{gap:18px}
 .toc a{border:1px solid var(--ink);padding:6px 12px;font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
 .toc a:hover{background:var(--green)}
 .cta{display:flex;flex-direction:column;justify-content:space-between;gap:28px;text-decoration:none;min-height:150px;transition:background .2s}
-.cta .ctat{font:800 clamp(22px,2.4vw,30px)/1.1 var(--sans);letter-spacing:-.03em}
+.cta .ctat{font:800 clamp(20px,1.95vw,27px)/1.1 var(--sans);letter-spacing:-.03em}
 .cta:not(.green):hover{background:var(--white)}.cta.green:hover{background:#6FE36A}
 /* how it works */
 .formula{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:var(--white)}

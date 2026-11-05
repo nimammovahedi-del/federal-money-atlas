@@ -246,9 +246,9 @@
       <div class="cell s4"><h2 class="t">Least back per $1: high-income suburbs and resorts</h2>${extremeList(bottom.slice(0, 4))}</div>
     </div>
     <div class="grid">
-      <a class="cell s4 cta green" href="#/analytics"><span class="label" style="color:var(--ink)">Analytics</span><span class="ctat">See every chart →</span></a>
-      <a class="cell s4 cta" href="#/how"><span class="label">Method</span><span class="ctat">How it's calculated →</span></a>
-      <a class="cell s4 cta" href="#/compare"><span class="label">Compare</span><span class="ctat">Your county vs. another →</span></a>
+      <a class="cell s4 cta green" href="#/analytics"><span class="label" style="color:var(--ink)">Analytics</span><span class="ctat">See every chart&nbsp;→</span></a>
+      <a class="cell s4 cta" href="#/how"><span class="label">Method</span><span class="ctat">How it's calculated&nbsp;→</span></a>
+      <a class="cell s4 cta" href="#/compare"><span class="label">Compare</span><span class="ctat">Your county vs. another&nbsp;→</span></a>
     </div>`;
   };
 
@@ -295,7 +295,7 @@
       <div class="cell s12 ${window.YEARS ? "" : "phone-hide"}" id="an-change"><p class="label">8 · Change</p><h2 class="t">Five years of federal money to counties</h2><div id="an-change-body">${changeChart(260)}${movers()}</div></div>
     </div>
     <div class="grid"><div class="cell s8 white" id="an-dl"><p class="label">9 · Download</p><h2 class="t">Every county's numbers in one file</h2><p class="small" style="margin-top:8px">${FM.int(ALL.length)} counties: population, money in by type, estimated taxes and dollars back per $1. Free to use; please cite the sources on <a href="#/how">Method</a>.</p></div>
-      <div class="cell s4 green cta" style="cursor:pointer" role="button" tabindex="0" id="dl-all"><span class="label" style="color:var(--ink)">CSV · ${FM.int(ALL.length)} rows</span><span class="ctat">Download all counties ↓</span></div></div>
+      <div class="cell s4 green cta" style="cursor:pointer" role="button" tabindex="0" id="dl-all"><span class="label" style="color:var(--ink)">CSV · ${FM.int(ALL.length)} rows</span><span class="ctat">Download all counties&nbsp;↓</span></div></div>
     <p class="foot">Money in: USAspending.gov obligations by place of performance. Taxes: IRS county data plus estimates scaled to Treasury totals. See <a href="#/how">how it works</a>.</p>`;
     V3.wireAnalytics(el);
   };
@@ -385,7 +385,7 @@
       ${pat("s4", 401)}
     </div>
     <div class="grid"><div class="cell s8 white"><p class="label">Status</p><h2 class="t">Fiscal year 2023 data</h2><p class="small" style="margin-top:8px">Numbers come from public data for fiscal year 2023; five-year change (2019–2023) is being added. See <a href="#/how">how it works</a> for the full method and its limits.</p></div>
-      <a class="cell s4 cta green" href="#/"><span class="label" style="color:var(--ink)">Start</span><span class="ctat">Find your county →</span></a></div>`;
+      <a class="cell s4 cta green" href="#/"><span class="label" style="color:var(--ink)">Start</span><span class="ctat">Find your county&nbsp;→</span></a></div>`;
   };
 
   // ---------- Tidy pass
