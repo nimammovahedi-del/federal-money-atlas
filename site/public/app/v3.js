@@ -2,7 +2,7 @@
    Needs ../rebuild/core.js (FM); charts.js (CH); optional years.js (window.YEARS) for 5-year change. */
 (function () {
   const STYLE = document.body.dataset.style || "pixel";
-  const $ = s => document.querySelector(s), go = f => location.hash = "#/county/" + f;
+  const $ = s => document.querySelector(s), go = f => FM.MULTI ? FM.go("#/county/" + f) : (location.hash = "#/county/" + f);
 
   // ---------- patterns that fill empty tiles (deterministic per seed)
   const rng = seed => () => (seed = (seed * 16807) % 2147483647) / 2147483647;
@@ -68,6 +68,7 @@
   if (FM.MULTI) {
     // Real site: keep Astro's header/footer; insert only <main> and the compare picker after the header.
     const tmp = document.createElement("div"); tmp.innerHTML = SHELL;
+    tmp.querySelector('[data-view="home"]').hidden = true;   // nothing shows until the router picks this page's view
     const anchor = document.querySelector("header.top");
     [...tmp.children].filter(n => !n.matches("header, footer, .skip")).reverse().forEach(n => anchor.after(n));
   } else document.body.insertAdjacentHTML("afterbegin", SHELL);
@@ -84,7 +85,7 @@
   const fmtPop = v => v === Infinity ? "any" : v >= 1e6 ? (v / 1e6).toFixed(1) + "M" : v >= 1e3 ? Math.round(v / 1e3) + "K" : String(v);
   const filterFn = () => { const [a, b] = MP.pop.map(popAt), [c, d] = MP.rat.map(ratAt), popOn = MP.pop[0] > 0 || MP.pop[1] < 100, ratOn = MP.rat[0] > 0 || MP.rat[1] < 60;
     if (!popOn && !ratOn) return "all";
-    return x => x.pop >= a && x.pop <= b && (!ratOn || (FM.hasRatio(x) && x.ratio >= c && x.ratio <= d)); };
+    return x => x.pop >= a && x.pop <= b && (!ratOn || (FM.hasRatio(x) && (v => v != null && v >= c && v <= d)(FM.perDollar(MP.kind, x)))); };
   $('[data-view="map"]').innerHTML = `
     <div class="keybar"><h1 id="map-title" tabindex="-1"></h1><div id="map-key"></div><a id="map-list" href="#/list">View as a list →</a></div>
     <div class="stage" id="stage">
@@ -115,7 +116,9 @@
   phone.addEventListener("change", e => setDrawer(!e.matches));
   const dual = (id, key, fmt, max) => {
     const box = $("#" + id), [lo, hi] = box.querySelectorAll("input"), fill = box.querySelector(".fill");
-    const sync = src => { let a = +lo.value, b = +hi.value; if (a > b) { if (src === lo) lo.value = a = b; else hi.value = b = a; }
+    const sync = src => { let a = +lo.value, b = +hi.value;
+      if (a >= b) { if (src === hi) { b = Math.min(max, a + 1); a = b - 1; } else { a = Math.max(0, b - 1); b = a + 1; } lo.value = a; hi.value = b; }
+      lo.style.zIndex = a > max / 2 ? 3 : ""; hi.style.zIndex = a > max / 2 ? 2 : "";
       MP[key] = [a, b]; fill.style.left = (100 * a / max) + "%"; fill.style.width = (100 * (b - a) / max) + "%";
       $("#" + id + "-o").textContent = fmt(a, b); lo.setAttribute("aria-valuetext", fmt(a, b).split("–")[0]); hi.setAttribute("aria-valuetext", fmt(a, b).split("–")[1] || ""); };
     lo.oninput = () => { sync(lo); mapUpdate(); }; hi.oninput = () => { sync(hi); mapUpdate(); }; sync();
@@ -143,7 +146,6 @@
     const c = FM.C[fips], el = $("#v-county");
     if (!c) { el.innerHTML = `<div class="grid"><div class="cell s12"><h1>County not found</h1><p class="lead">Try the search on the <a href="#/">home page</a> or browse <a href="#/list">every county</a>.</p></div></div>`; return; }
     const ok = FM.hasRatio(c), sr = FM.stateRank(c), max = Math.max(c.money, c.taxes, 1), pp = v => FM.whole(v / c.pop), caution = FM.caution(c);
-    const nbs = [c, ...FM.neighbors(c)].filter(x => FM.hasRatio(x)).sort((a, b) => b.ratio - a.ratio), nmax = Math.max(...nbs.map(x => x.ratio), .01);
     const share = v => c.money > 0 ? Math.max(0, v) / c.money : 0, sharePct = v => { const x = share(v); return x > 0 && x < .005 ? "<1%" : Math.round(100 * x) + "%"; };
     const tile = (lab, v, sub, est) => `<div class="cell s3"><h2 class="label">${lab}${est ? '<span class="est">est.</span>' : ""}</h2><p class="big" style="margin-top:16px">${FM.money(v)}</p><p class="small" style="margin-top:8px">${sub}</p>
       <div class="mini" style="background:#E5E5E5" aria-hidden="true"><div style="height:100%;width:${100 * share(v)}%;background:var(--green)"></div></div></div>`;
@@ -173,7 +175,7 @@
     <div class="grid"><div class="cell s12 white who" id="who"></div></div>
     <div class="grid">
       <div class="cell s5 nbmapcell"><h2 class="label">Next door</h2><svg id="nbmap" style="width:100%;height:auto;display:block;margin-top:12px" role="img" aria-label="Map of ${FM.esc(c.name)} and neighboring counties"></svg></div>
-      <div class="cell s4"><h2 class="label">Back per $1, with neighbors</h2><ul class="nb">${nbs.map(x => `<li class="${x === c ? "me" : ""}"><a href="#/county/${x.fips}">${FM.esc(x.short)}${x === c ? " (this county)" : x.st !== c.st ? ", " + x.st : ""}</a><i style="width:${100 * Math.max(0, x.ratio) / nmax}%" aria-hidden="true"></i><span>${FM.r2(x.ratio)}</span></li>`).join("")}</ul></div>
+      <div class="cell s4"><h2 class="label">Back per $1, with neighbors</h2><ul class="nb" id="nb-list"><li class="small">Loading neighbors…</li></ul></div>
       <div class="cell s3"><h2 class="label">More</h2><div class="act">
         <button id="csv">Download the numbers <span class="tag">CSV</span></button>
         <a href="#/compare?pins=${c.fips}">Compare with others <span aria-hidden="true">→</span></a>
@@ -184,7 +186,15 @@
     $("#csv").onclick = () => FM.downloadCSV(c);
     window.V3.who($("#who"), c);
     window.V3.cite($("#cite"), `${c.name}, ${FM.stName(c.st)}`);
-    FM.neighborMap($("#nbmap"), c, go);
+    // Neighbors need the county shapes; draw them when those arrive (the rest of the page shows right away).
+    const fillNeighbors = () => {
+      if (document.body.dataset.fips && document.body.dataset.fips !== c.fips) return;
+      const nbs = [c, ...FM.neighbors(c).filter(x => FM.hasRatio(x))].sort((a, b) => (FM.hasRatio(b) ? b.ratio : -1) - (FM.hasRatio(a) ? a.ratio : -1)), nmax = Math.max(...nbs.map(x => x.ratio || 0), .01);
+      const ul = $("#nb-list"); if (!ul) return;
+      ul.innerHTML = nbs.map(x => `<li class="${x === c ? "me" : ""}"><a href="#/county/${x.fips}">${FM.esc(x.short)}${x === c ? " (this county)" : x.st !== c.st ? ", " + x.st : ""}</a><i style="width:${100 * Math.max(0, x.ratio || 0) / nmax}%" aria-hidden="true"></i><span>${FM.hasRatio(x) ? FM.r2(x.ratio) : "—"}</span></li>`).join("");
+      if (FM.geo.byId[c.fips]) FM.neighborMap($("#nbmap"), c, go); else $(".nbmapcell").style.display = "none";   // e.g. Connecticut's new planning regions have no shapes yet
+    };
+    FM.geo ? fillNeighbors() : FM.loadGeometry().then(fillNeighbors);
   }
 
   // ---------- LIST (Option B style)
@@ -210,10 +220,10 @@
   ["#l-q", "#l-st", "#l-sz", "#l-k", "#l-sort"].forEach(s => $(s).addEventListener("input", () => { LN = 50;
     LP = { q: $("#l-q").value, st: $("#l-st").value, size: $("#l-sz").value, kind: $("#l-k").value, sort: $("#l-sort").value };
     history.replaceState(null, "", FM.listURL(LP)); drawList(); }));
-  $("#l-more").onclick = () => { LN += 50; drawList(); };
-  function list(_, p) { LP = FM.listParams(p); $("#l-q").value = LP.q; $("#l-st").value = LP.st; $("#l-sz").value = LP.size; $("#l-k").value = LP.kind; $("#l-sort").value = LP.sort; LN = 50; drawList(); }
+  $("#l-more").onclick = () => { LN += 50; history.replaceState({ ln: LN }, "", location.href); drawList(); };
+  function list(_, p) { LP = FM.listParams(p); $("#l-q").value = LP.q; $("#l-st").value = LP.st; $("#l-sz").value = LP.size; $("#l-k").value = LP.kind; $("#l-sort").value = LP.sort; LN = (history.state && history.state.ln) || 50; drawList(); }
   function drawList() { const rows = FM.listRows(LP);
-    $("#l-n").textContent = `${FM.int(rows.length)} counties · ${FM.KINDS[LP.kind].short} back per $1`;
+    $("#l-n").textContent = `${FM.int(rows.length)} ${rows.length === 1 ? "county" : "counties"} · ${FM.KINDS[LP.kind].short} back per $1`;
     $("#l-rows").innerHTML = rows.slice(0, LN).map(({ c, v }) => row(c, `${FM.esc(FM.stName(c.st))} · ${FM.int(c.pop)} residents`, v)).join("");
     $("#l-more").hidden = rows.length <= LN; }
 
@@ -233,7 +243,10 @@
       <div style="margin-top:32px" id="cmp"></div>
       <button class="linkbtn" id="copy">Copy link to this comparison</button></div>`;
   let PINS = [], pkMap;
-  const setPins = l => location.hash = "#/compare?pins=" + l.join(",");
+  const setPins = l => {
+    if (!FM.MULTI) { location.hash = "#/compare?pins=" + l.join(","); return; }
+    history.pushState(null, "", "/compare/" + (l.length ? "?pins=" + l.join(",") : "")); compare(null, new URLSearchParams(location.search)); };
+  if (FM.MULTI) addEventListener("popstate", () => { if (document.body.dataset.page === "compare") compare(null, new URLSearchParams(location.search)); });
   const addPin = f => { if (PINS.includes(f) || PINS.length >= 3) return; setPins([...PINS, f]); };
   $("#c-st").onchange = e => { const st = e.target.value, sel = $("#c-co");
     sel.innerHTML = st ? FM.ALL.filter(c => c.st === st).sort((a, b) => a.name.localeCompare(b.name)).map(c => `<option value="${c.fips}">${FM.esc(c.name)} (${FM.r2(c.ratio)})</option>`).join("") : "<option>Choose a state first</option>";
@@ -242,7 +255,8 @@
   FM.combobox($("#c-q"), c => addPin(c.fips));
   $("#copy").onclick = e => FM.copyLink(e.currentTarget);
   const openPicker = open => { $("#picker").classList.toggle("open", open); $("#scrim").classList.toggle("on", open); $("#picker").setAttribute("aria-hidden", !open); $("#picker").inert = !open;
-    if (open) { if (!pkMap && FM.geo) { pkMap = FM.makeMap($("#pk-map"), { bg: "#FFFFFF", sheet: false, onPick: ids => addPin(ids[0]), label: "Map of counties. Click a county to add it to the comparison." }); }
+    if (open) { if (!FM.geo) FM.loadGeometry().then(() => $("#picker").classList.contains("open") && openPicker(true));
+      if (!pkMap && FM.geo) { pkMap = FM.makeMap($("#pk-map"), { bg: "#FFFFFF", sheet: false, onPick: ids => addPin(ids[0]), label: "Map of counties. Click a county to add it to the comparison." }); }
       if (pkMap) { pkMap.set({ kind: "all", size: "all", view: "land" }); pkMap.select(PINS[PINS.length - 1] || null); }
       $("#pk-legend").innerHTML = FM.legendHTML("all", "all"); drawChosen(); $("#pk-close").focus(); }
     else $("#c-pick").focus(); };
@@ -270,9 +284,12 @@
   window.V3.about($("#v-about"), pat);
 
   // ---------- start
-  FM.loadGeometry().then(() => {
-    bigMap = FM.makeMap($("#map2"), { label: "Map of U.S. counties. Use the options panel to filter; use the county list for a text version." });
-    mapUpdate();
-    FM.route({ county, list, compare, map: () => { if (phone.matches) setDrawer(false); mapUpdate(); setTimeout(() => $("#map-title").focus({ preventScroll: true }), 0); }, analytics: () => window.V3.onShow("analytics"), home: () => window.V3.onShow("home") });
-  });
+  const routes = { county, list, compare, map: () => { if (phone.matches) setDrawer(false); mapUpdate(); setTimeout(() => $("#map-title").focus({ preventScroll: true }), 0); }, analytics: () => window.V3.onShow("analytics"), home: () => window.V3.onShow("home") };
+  const makeBig = () => { if (!bigMap) { bigMap = FM.makeMap($("#map2"), { label: "Map of U.S. counties. Use the options panel to filter; use the county list for a text version." }); mapUpdate(); } };
+  const PAGE = document.body.dataset.page;
+  if (FM.MULTI) {
+    // Only the map, county and compare pages need the county shapes (~800 KB); everything else shows at once.
+    FM.route(routes);
+    if (PAGE === "map") FM.loadGeometry().then(makeBig); else if (PAGE === "compare") FM.loadGeometry();
+  } else FM.loadGeometry().then(() => { makeBig(); FM.route(routes); });
 })();

@@ -1,13 +1,16 @@
 ---
 // Shared page frame: head (title, description, link previews), header, footer and the app scripts.
 // `page` tells the browser app which view to show; county pages also pass `fips`.
+import { existsSync } from "node:fs";
 import { META } from "../lib/format";
 interface Props { title: string; description: string; page: string; fips?: string; }
 const { title, description, page, fips } = Astro.props;
 const full = title === "Federal Money Atlas" ? title : `${title} · Federal Money Atlas`;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const og = new URL("/og.png", Astro.site).href;
-const v = "0.5.0";
+const v = "0.5.1";
+// 5-year change data (public/app/years.js) is optional until FY2019–2022 are built (builds run from site/).
+const hasYears = existsSync("public/app/years.js");
 const nav = [["home", "/", "Home"], ["map", "/map/", "Map"], ["analytics", "/analytics/", "Analytics"], ["list", "/counties/", "Counties"], ["compare", "/compare/", "Compare"], ["how", "/how-it-works/", "How it works"], ["about", "/about/", "About"]];
 ---
 <!doctype html>
@@ -61,7 +64,7 @@ const nav = [["home", "/", "Home"], ["map", "/map/", "Map"], ["analytics", "/ana
   <script is:inline src="/vendor/d3.min.js"></script>
   <script is:inline src="/vendor/topojson-client.min.js"></script>
   <script is:inline src={`/app/data.js?v=${v}`}></script>
-  <script is:inline src="/app/years.js" onerror="this.remove()"></script>
+  {hasYears && <script is:inline src={`/app/years.js?v=${v}`}></script>}
   <script is:inline src={`/app/core.js?v=${v}`}></script>
   <script is:inline src={`/app/pages.js?v=${v}`}></script>
   <script is:inline src={`/app/v3.js?v=${v}`}></script>

@@ -151,7 +151,7 @@
   V3.downloadAll = () => {
     const head = ["fips", "county", "state", "population", "money_in", "social_security_ssi", "grants", "grants_statewide_share_est", "contracts", "taxes_paid_est", "income_tax", "dollars_back_per_1"];
     const rows = ALL.map(c => [c.fips, `"${c.name}"`, c.st, c.pop, Math.round(c.money), Math.round(c.ss), Math.round(c.gr), Math.round(c.gs), Math.round(c.con), Math.round(c.taxes), Math.round(c.ti), c.ratio == null ? "" : c.ratio.toFixed(4)].join(","));
-    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([[head.join(","), ...rows].join("\n")], { type: "text/csv" })); a.download = `federal-money-atlas-counties-fy${FM.FY}.csv`; a.click();
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([[head.join(","), ...rows].join("\n")], { type: "text/csv" })); a.download = `federal-money-atlas-counties-fy${FM.FY}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
   // Who got the money: top recipients, agencies and programs for one county, live from the USAspending API (FY2023,
   // place of performance), cached for the visit. Connecticut planning regions aren't supported by the API yet.
@@ -176,12 +176,14 @@
       <div id="who-body" role="tabpanel" aria-live="polite"></div>
       <p class="small whosrc">Live from <a href="https://www.usaspending.gov/" target="_blank" rel="noopener">USAspending.gov</a>, by where the work or payment happens. Top 10 shown; amounts are FY${FM.FY} obligations.</p>`;
     const body = el.querySelector("#who-body");
-    const show = key => {
+    let cur = null;
+    const show = key => { cur = key;
       el.querySelectorAll("[role=tab]").forEach(b => { const on = b.dataset.k === key; b.setAttribute("aria-selected", on); b.tabIndex = on ? 0 : -1; });
       body.setAttribute("aria-labelledby", "wt-" + key);
-      if (c.st === "CT") { body.innerHTML = `<p class="small whomsg">USAspending still files Connecticut by its old counties, so recipients for planning regions aren't available yet.</p>`; return; }
+      if (c.st === "CT") { body.innerHTML = `<p class="small whomsg">USAspending still files Connecticut by its old counties, so this list isn't available for planning regions yet.</p>`; return; }
       body.innerHTML = `<p class="small whomsg">Loading from USAspending.gov…</p>`;
       whoFetch(c, key).then(rows => {
+        if (key !== cur) return;   // another tab was chosen while this one loaded
         if (!rows.length) { body.innerHTML = `<p class="small whomsg">No ${WHO[key].label.toLowerCase()} reported for this county.</p>`; return; }
         const mx = Math.max(...rows.map(r => Math.abs(r.amount)), 1);
         body.innerHTML = `<p class="small">${WHO[key].note}</p><ol class="whol">${rows.map(r => {
@@ -189,7 +191,7 @@
           const href = key === "recipients" && r.recipient_id ? `https://www.usaspending.gov/recipient/${r.recipient_id}/latest` : "";
           return `<li><span class="wn">${href ? `<a href="${href}" target="_blank" rel="noopener">${name}</a>` : name}${r.code && key !== "recipients" ? ` <small>${esc(r.code)}</small>` : ""}</span>
             <span class="wb" aria-hidden="true"><i style="width:${100 * Math.max(0, r.amount) / mx}%"></i></span><b>${M(r.amount)}</b></li>`; }).join("")}</ol>`;
-      }).catch(() => { body.innerHTML = `<p class="small whomsg">USAspending.gov didn't answer in time. <button class="linkbtn" type="button" id="who-retry">Try again</button></p>`;
+      }).catch(() => { if (key !== cur) return; body.innerHTML = `<p class="small whomsg">USAspending.gov didn't answer in time. <button class="linkbtn" type="button" id="who-retry">Try again</button></p>`;
         body.querySelector("#who-retry").onclick = () => show(key); });
     };
     el.querySelectorAll("[role=tab]").forEach((b, i, all) => { b.onclick = () => show(b.dataset.k);
@@ -202,7 +204,7 @@
     const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
     const text = `Federal Money Atlas (version ${FM.VERSION}). “${title}.” Data: ${FM.DATA_NOTE}. Accessed ${today}. ${location.href}`;
     el.innerHTML = `<h2 class="label">Cite this page</h2><p class="citet" id="cite-t">${esc(text)}</p>
-      <div class="citeacts"><button class="btn sm" type="button" id="cite-copy">Copy citation</button><a class="textlink" href="#/how" style="margin:0">Data version &amp; changes →</a></div>`;
+      <div class="citeacts"><button class="btn sm" type="button" id="cite-copy">Copy citation</button><a class="textlink" href="${FM.MULTI ? "/how-it-works/#how-version" : "#/how"}" style="margin:0">Data version &amp; changes →</a></div>`;
     el.querySelector("#cite-copy").onclick = e => { const b = e.currentTarget;
       (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => { b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy citation", 1600); }, () => prompt("Copy this citation:", text)); };
   };

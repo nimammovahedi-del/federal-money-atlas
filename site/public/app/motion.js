@@ -22,5 +22,5 @@
     const v = document.querySelector("[data-view]:not([hidden])"); if (!v) return;
     v.querySelectorAll(".giant").forEach(el => { if (el.dataset.final) el.textContent = el.dataset.final; io.observe(el); });
   }, 140);
-  addEventListener("hashchange", arm); arm();
+  addEventListener("hashchange", arm); document.addEventListener("fm:route", arm); arm();
 })();

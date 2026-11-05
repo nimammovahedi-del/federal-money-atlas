@@ -19,7 +19,9 @@
     new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) { if (n.matches && n.matches('a[href^="#/"]')) n.setAttribute("href", FM.path(n.getAttribute("href"))); fix(n); } })))
       .observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ["href"] });
     addEventListener("DOMContentLoaded", () => fix(document));
-    addEventListener("hashchange", () => { if (location.hash.startsWith("#/")) location.href = FM.path(location.hash); });
+    addEventListener("hashchange", () => { if (location.hash.startsWith("#/")) location.replace(FM.path(location.hash)); });
+    if (location.hash.startsWith("#/")) location.replace(FM.path(location.hash));   // old shared links like /#/county/39049
+    FM.go = h => location.assign(FM.path(h));
   }
   FM.STATE_NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District of Columbia",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
   FM.stName = s => FM.STATE_NAMES[s] || s;
@@ -299,7 +301,7 @@
       document.querySelectorAll("[data-view]").forEach(v => v.hidden = v.dataset.view !== view);
       document.querySelectorAll("[data-nav]").forEach(a => a.setAttribute("aria-current", a.dataset.nav === view ? "page" : "false"));
       FM.tip(null);
-      if (view !== last) { window.scrollTo({ top: 0, behavior: "instant" }); last = view; }
+      if (view !== last) { if (!(FM.MULTI && last === null)) window.scrollTo({ top: 0, behavior: "instant" }); last = view; }
       const pre = document.getElementById("static"); if (pre) pre.remove();   // static (no-JS / search engine) version gives way to the interactive one
       handlers[view] && handlers[view](parts[1], new URLSearchParams(q || ""));
       const c = view === "county" && FM.C[parts[1]];
@@ -307,6 +309,7 @@
       FM._inputs.forEach(i => { if (document.activeElement !== i) i.value = ""; });
       if (view !== "home" && moved) { const h = document.querySelector(`[data-view="${view}"] h1`); if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); } }
       moved = true;
+      document.dispatchEvent(new CustomEvent("fm:route", { detail: view }));
     };
     // Optional smooth page changes (view transitions); off when the user prefers reduced motion.
     const still = matchMedia("(prefers-reduced-motion: reduce)");
