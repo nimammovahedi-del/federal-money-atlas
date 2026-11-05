@@ -1,0 +1,40 @@
+---
+// One static page per county (3,144). This HTML is what search engines, link previews and people without
+// JavaScript see; in a normal browser the interactive version (map, who-got-the-money, citation) replaces it.
+import Site from "../../layouts/Site.astro";
+import { COUNTIES, META, STATE_NAMES, caution, int, money, r2, sentence, whole } from "../../lib/format";
+
+export function getStaticPaths() {
+  return COUNTIES.map((c) => ({ params: { fips: c.fips }, props: { c } }));
+}
+const { c } = Astro.props;
+const st = STATE_NAMES[c.st] || c.st;
+const note = caution(c);
+const pp = (v: number | null) => (v === null ? "—" : whole(v / c.pop));
+const desc = c.ratio !== null
+  ? `${c.name}, ${st}: ${r2(c.ratio)} in federal money came back for every $1 its residents paid in federal taxes in fiscal year ${META.fiscal_year}. Social Security, grants and contracts, with sources.`
+  : `${c.name}, ${st}: federal money that came back in fiscal year ${META.fiscal_year}, with sources.`;
+---
+<Site title={`${c.name}, ${c.st}`} description={desc} page="county" fips={c.fips}>
+  <article class="grid">
+    <div class="cell s8 white">
+      <p class="crumb"><a href="/">Home</a> / <a href="/counties/">Counties</a> / {st}</p>
+      <h1>{c.name}, {st}</h1>
+      <p class="lead">{sentence(c)}</p>
+      {note && <p class="fm-caution"><b>Note</b><span>{note}</span></p>}
+      <p class="small" style="margin-top:16px">Fiscal year {META.fiscal_year} · {int(c.pop)} residents · data as of {META.data_as_of}</p>
+    </div>
+    <div class="cell s4 green">
+      <p class="label" style="color:var(--ink)">Back per $1 of federal tax</p>
+      <p class="giant">{r2(c.ratio)}</p>
+      <p style="margin-top:12px;font-weight:600">Typical county: {r2(META.median_ratio)}{c.rank !== null && <> · #{int(c.rank)} of {int(META.n_ratio)} counties with a figure · {c.st_rank} of {c.st_n} in {st}</>}</p>
+    </div>
+  </article>
+  <section class="grid">
+    <div class="cell s4"><h2 class="label">Federal money that came back</h2><p class="big" style="margin-top:12px">{money(c.money)}</p><p class="small">{pp(c.money)} per resident</p></div>
+    <div class="cell s4"><h2 class="label">Federal taxes residents paid (est.)</h2><p class="big" style="margin-top:12px">{money(c.taxes)}</p><p class="small">{pp(c.taxes)} per resident</p></div>
+    <div class="cell s4"><h2 class="label">Where it came from</h2>
+      <p class="small" style="margin-top:12px">Social Security &amp; SSI: <b>{money(c.ss)}</b><br>Grants (est.): <b>{money(c.grants)}</b><br>Contracts: <b>{money(c.contracts)}</b></p></div>
+  </section>
+  <p class="foot">Sources: USAspending.gov, IRS Statistics of Income, U.S. Treasury, Census Bureau. See <a href="/how-it-works/">how it works</a>.</p>
+</Site>

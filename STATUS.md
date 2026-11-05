@@ -338,6 +338,35 @@ You chose round 2's Type style. **Start at `design/rebuild3/type.html`.**
 
 **Note:** the who-got-the-money panel calls USAspending's API from the visitor's browser. For launch, consider pre-building these lists from the bulk files, so the site doesn't depend on the API being up.
 
+### Phase 1 data fixes (2026-11-05)
+- **Statewide grants are shared by need, not population:**
+  - Medicaid/CHIP by people with Medicaid coverage.
+  - School, child-welfare and Head Start programs by children.
+  - TANF, child care and energy aid by people in poverty.
+  - WIC and SNAP administration by SNAP households.
+  - The rest by population.
+  - Sources are keyless Census files: ACS 2019–2023 table-based summary files and SAIPE 2023. The Census API now requires a key, so it isn't used. State totals are unchanged.
+- **Nationwide health-benefit contracts** ($35.6B: VA community care via Optum and TriWest; TRICARE via Humana Government Business and Health Net) move out of the county where they're booked into an uncounted "national programs" line. Spotsylvania, VA goes from $14.85 to $0.69 back per $1.
+- **New results:** typical county $1.12, U.S. overall $0.73; states still match Rockefeller (correlation 0.965).
+- **Downloader:** resumes after any failure. FY2019–2022 are downloading in the background; after they finish, run `make_years.py` and copy `design/rebuild3/years.js` to `site/public/app/`.
+
+### The real site (2026-11-05) — `site/`
+- **Astro 7** static site with real addresses: `/`, `/map/`, `/analytics/`, `/counties/`, `/compare/`, `/how-it-works/`, `/about/`, `/county/{FIPS}/` (3,144 pages), and a 404 page. 3,152 pages build in about 1 second; 3,164 files, 26 MB.
+- **County pages** are built as plain HTML (answer, note, numbers, ranks), with title, description and link-preview tags (`public/og.png`). In a browser, the interactive version (from the prototype code in `public/app/`) replaces it.
+- **Self-hosted:** map shapes and chart libraries are stored in `public/vendor/`; no outside CDN except Google Fonts. The who-got-the-money panel still calls USAspending's API.
+- **Page changes** use the browser's cross-document view transitions (off for reduced motion).
+- **Checked:** search, county pages, map, list filters saved in the address, compare (dropdowns, saved link), 404 status; all 8 pages at phone width.
+- **Build and preview:**
+  - Data: `cd scripts && ../.venv/bin/python build_phase0.py && ../.venv/bin/python make_site_data.py`
+  - Site: `cd site && npm run build && npm run preview`
+  - Or start the preview "federal-money-atlas-site" in Claude Code.
+- **Not done yet:**
+  - Deploy (needs your **new** Cloudflare account and a GitHub repo).
+  - Final domain (`SITE_URL`).
+  - Monthly data refresh with GitHub Actions.
+  - Per-county share images.
+  - An error-report channel.
+
 ## How to rerun Phase 0
 
 ```bash

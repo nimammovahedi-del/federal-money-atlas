@@ -1,0 +1,70 @@
+---
+// Shared page frame: head (title, description, link previews), header, footer and the app scripts.
+// `page` tells the browser app which view to show; county pages also pass `fips`.
+import { META } from "../lib/format";
+interface Props { title: string; description: string; page: string; fips?: string; }
+const { title, description, page, fips } = Astro.props;
+const full = title === "Federal Money Atlas" ? title : `${title} · Federal Money Atlas`;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const og = new URL("/og.png", Astro.site).href;
+const v = "0.5.0";
+const nav = [["home", "/", "Home"], ["map", "/map/", "Map"], ["analytics", "/analytics/", "Analytics"], ["list", "/counties/", "Counties"], ["compare", "/compare/", "Compare"], ["how", "/how-it-works/", "How it works"], ["about", "/about/", "About"]];
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{full}</title>
+  <meta name="description" content={description}>
+  <link rel="canonical" href={canonical}>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Federal Money Atlas">
+  <meta property="og:title" content={full}>
+  <meta property="og:description" content={description}>
+  <meta property="og:url" content={canonical}>
+  <meta property="og:image" content={og}>
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href={`/app/base.css?v=${v}`}>
+  <link rel="stylesheet" href={`/app/v3.css?v=${v}`}>
+  <style is:global>
+    /* smooth page-to-page changes (cross-document view transitions; ignored by browsers without support) */
+    @view-transition { navigation: auto; }
+    @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
+    #static { max-width: 1320px; margin: 0 auto; padding: 0 24px 48px; }
+  </style>
+</head>
+<body data-style="type" data-page={page} data-fips={fips}>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top no-print">
+    <a class="brand" href="/"><i aria-hidden="true"><b></b><b></b><b></b><b></b></i>Federal Money Atlas</a>
+    <nav class="main" aria-label="Main">
+      {nav.map(([k, href, label]) => (
+        <a href={href} data-nav={k} class={k === "home" ? "nav-home" : undefined} aria-current={k === page ? "page" : undefined}>
+          {k === "how" ? <><span class="long">How it works</span><span class="short">Method</span></> : label}
+        </a>
+      ))}
+    </nav>
+  </header>
+  <div id="static"><slot /></div>
+  <footer class="site-foot no-print"><div class="grid">
+    <div class="cell s4"><a class="brand" href="/"><i aria-hidden="true"><b></b><b></b><b></b><b></b></i>Federal Money Atlas</a>
+      <p class="small" style="margin-top:12px">Where federal money lands, county by county. Fiscal year {META.fiscal_year} · data as of {META.data_as_of} · version {v}.</p>
+      <p class="small" style="margin-top:8px">A prototype — not yet published.</p></div>
+    <div class="cell s4"><p class="label">Explore</p><ul class="flinks"><li><a href="/map/">Map</a></li><li><a href="/analytics/">Analytics</a></li><li><a href="/counties/">Every county</a></li><li><a href="/compare/">Compare</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/about/">About</a></li></ul></div>
+    <div class="cell s4"><p class="label">Data</p><ul class="flinks"><li><a href="/how-it-works/">Sources &amp; method</a></li><li><button type="button" class="linkbtn" id="foot-dl" style="margin:0">Download all counties (CSV)</button></li><li><a href="/how-it-works/#how-version">Data version &amp; changes</a></li><li><span class="small">Report an error — a public issue tracker opens at launch</span></li></ul>
+      <p class="small" style="margin-top:12px">Public data from USAspending.gov, IRS, U.S. Treasury and the Census Bureau.</p></div>
+  </div></footer>
+  <script is:inline src="/vendor/d3.min.js"></script>
+  <script is:inline src="/vendor/topojson-client.min.js"></script>
+  <script is:inline src={`/app/data.js?v=${v}`}></script>
+  <script is:inline src="/app/years.js" onerror="this.remove()"></script>
+  <script is:inline src={`/app/core.js?v=${v}`}></script>
+  <script is:inline src={`/app/pages.js?v=${v}`}></script>
+  <script is:inline src={`/app/v3.js?v=${v}`}></script>
+  <script is:inline src={`/app/motion.js?v=${v}`}></script>
+</body>
+</html>

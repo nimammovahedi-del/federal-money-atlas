@@ -1,0 +1,61 @@
+/* Shared tokens for all three iterations, taken from nader.io:
+   light gray page, near-black ink, mid-gray text, hairline borders, one signal green.
+   Inter for everything; JetBrains Mono for small uppercase labels and figures. */
+:root{
+  --bg:#F6F6F6; --ink:#0A0A0A; --mute:#5E5E5E; --faint:#8A8A8A; --line:#E5E5E5; --white:#FFFFFF;
+  --green:#51DA4C;        /* fills only: money that came back */
+  --green-ink:#1A7A26;    /* green text and links (4.9:1 on --bg) */
+  --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--sans);font-feature-settings:"tnum" 1,"cv11" 1}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--ink)!important;outline-offset:3px!important}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:var(--bg);padding:8px 12px;z-index:100;text-decoration:none}
+.skip:focus{left:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.label{font:600 11px/1.5 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin:0}
+h2.label,h3.label{font:600 11px/1.5 var(--sans)}
+.mono{font-family:var(--mono)}
+main:focus{outline:none}
+.fm-map{width:100%;height:auto;display:block}
+.fm-hit{cursor:pointer}
+.fm-hit:hover{stroke:var(--ink);stroke-width:1}
+.fm-tip{position:fixed;z-index:60;display:none;pointer-events:none;background:var(--ink);color:var(--bg);font:500 13px/1.45 var(--sans);padding:8px 10px;border-radius:6px;max-width:240px}
+.fm-tip b{font-weight:700}
+.ramp{display:flex;height:8px;width:150px;border-radius:2px;overflow:hidden}.ramp i{flex:1}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+@media print{.no-print{display:none!important}}
+/* search suggestions (shared combobox) */
+.fm-options{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:40;list-style:none;margin:0;padding:4px;background:var(--white);border:1px solid var(--ink);border-radius:8px;max-height:320px;overflow:auto;box-shadow:0 12px 32px rgba(0,0,0,.08)}
+.fm-options li{display:flex;justify-content:space-between;gap:12px;padding:9px 10px;border-radius:5px;cursor:pointer;font-size:15px}
+.fm-options li[aria-selected="true"]{background:var(--bg)}
+.fm-options .fm-opt-v{font-family:var(--mono);font-size:13px;color:var(--mute)}
+.fm-options .fm-none{color:var(--mute);cursor:default}
+
+/* inputs: visible borders (3:1 or better) */
+input,select{border-color:var(--faint)!important}
+/* map key: every swatch labeled with its range */
+.fm-legend{display:flex;flex-wrap:wrap;gap:6px 14px;list-style:none;margin:10px 0 0;padding:0;font:500 12px var(--sans);color:var(--mute)}
+.fm-legend li{display:flex;align-items:center;gap:6px}
+.fm-legend i{width:14px;height:14px;border-radius:2px;display:inline-block}
+.fm-hatch{background:repeating-linear-gradient(45deg,#F1F1F1 0 3px,#A8A8A8 3px 4.5px)}
+/* result panel next to the map */
+.fm-sheet{position:absolute;left:12px;bottom:12px;width:min(320px,calc(100% - 24px));background:var(--white);border:1px solid var(--ink);padding:16px 18px 14px;z-index:5}
+.fm-sheet p{margin:0}
+.fm-close{position:absolute;top:6px;right:8px;border:0;background:none;font:400 24px/1 var(--sans);cursor:pointer;padding:4px 8px;color:var(--mute)}
+.fm-sheet-k{font:600 11px/1.5 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);padding-right:28px}
+.fm-sheet-n{font:700 18px/1.25 var(--sans);letter-spacing:-.01em;margin-top:2px!important}
+.fm-sheet-v{font:800 40px/1 var(--sans);letter-spacing:-.04em;margin-top:8px!important}
+.fm-sheet-s{font-size:13px;color:var(--mute);margin-top:4px!important}
+.fm-sheet-go{display:inline-block;margin-top:12px;font:600 14px var(--sans);text-decoration:none;border-bottom:2px solid var(--ink);padding-bottom:2px}
+.fm-sheet-l{list-style:none;margin:10px 0 0;padding:0;max-height:170px;overflow:auto}
+.fm-sheet-l a{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line);text-decoration:none;font-size:14px}
+.fm-sheet-l a span:last-child{font-family:var(--mono);font-size:13px}
+.fm-caution{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;background:var(--white);border:1px solid var(--ink);padding:10px 12px;margin-top:14px}
+.fm-caution b{font:600 11px/1.6 var(--sans);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+@media (max-width:640px){.fm-sheet{position:static;width:auto;margin-top:10px}}
