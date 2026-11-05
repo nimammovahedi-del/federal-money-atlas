@@ -421,7 +421,8 @@
       if (a && names[a.id]) { cur = document.createElement("details"); cur.className = "an-sec"; cur.dataset.sec = a.id;
         cur.innerHTML = `<summary>${names[a.id]}</summary>`; g.before(cur); secs.push(cur); }
       if (cur) cur.appendChild(g); });
-    const set = () => secs.forEach(d => d.open = !phone.matches); set(); phone.addEventListener("change", set);
+    const OPEN_ON_PHONE = ["an-spread", "an-pp", "an-who", "an-type"];   // the main four start open on phones too
+    const set = () => secs.forEach(d => d.open = !phone.matches || OPEN_ON_PHONE.includes(d.dataset.sec)); set(); phone.addEventListener("change", set);
     el.querySelectorAll("[data-jump]").forEach(b => b.addEventListener("click", () => { const t = document.getElementById(b.dataset.jump), d = t && t.closest("details.an-sec"); if (d) d.open = true; }, true));
   };
 
