@@ -3,7 +3,8 @@
 (function () {
   const V3 = (window.V3 = {});
   const R = FM.r2, M = FM.money, ALL = FM.ALL, OK = ALL.filter(FM.hasRatio);
-  const MOB = matchMedia("(max-width: 760px)").matches;   // phones get narrower charts so labels stay readable
+  const MOB = matchMedia("(max-width: 760px)").matches;
+  const NARROW = matchMedia("(max-width: 1180px)").matches;   // bar labels shorten before they would collide   // phones get narrower charts so labels stay readable
   FM.VERSION = "1.0"; FM.DATA_NOTE = "USAspending bulk files of Oct 6, 2026 (FY2023); IRS SOI county data, tax year 2023; Census Vintage 2025 and ACS 2019–2023; Treasury MTS FY2023";
   const sum = (l, f) => l.reduce((a, c) => a + (f(c) || 0), 0);
   const esc = FM.esc;
@@ -12,6 +13,7 @@
   const T = { ss: sum(ALL, c => c.ss), gr: sum(ALL, c => c.gr), con: sum(ALL, c => c.con), tax: sum(ALL, c => c.taxes) };
   T.money = T.ss + T.gr + T.con;
   const BINS = [0, .5, .75, 1, 1.25, 1.5, 2, 3, Infinity];
+  const medOf = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.floor(b.length / 2)]; };
   const binLab = i => BINS[i + 1] === Infinity ? "$3+" : `${R(BINS[i]).replace(".00", "")}–${R(BINS[i + 1]).replace(".00", "")}`;
   const hist = BINS.slice(0, -1).map((lo, i) => OK.filter(c => c.ratio >= lo && c.ratio < BINS[i + 1]).length);
   const above1 = OK.filter(c => c.ratio >= 1).length;
@@ -36,7 +38,7 @@
     const P = 28, max = Math.max(...hist), bw = (W - P * 2) / hist.length;
     const x = v => { let i = BINS.findIndex((b, j) => v >= b && v < BINS[j + 1]); const lo = BINS[i], hi = BINS[i + 1] === Infinity ? 4 : BINS[i + 1]; return P + bw * (i + (v - lo) / (hi - lo)); };
     const bars = hist.map((n, i) => { const bh = (h - 62) * n / max, X = P + i * bw;
-      return `<rect x="${X + 3}" y="${h - 30 - bh}" width="${bw - 6}" height="${bh}" fill="${BINS[i] >= 1 ? "#51DA4C" : "#C9C9C9"}"/><text x="${X + bw / 2}" y="${h - 36 - bh}" text-anchor="middle" class="cv">${n}</text><text x="${X + bw / 2}" y="${h - 12}" text-anchor="middle" class="cl">${MOB ? (BINS[i + 1] === Infinity ? "$3+" : R(BINS[i]).replace(".00", "")) : binLab(i)}</text>`; }).join("");
+      return `<rect x="${X + 3}" y="${h - 30 - bh}" width="${bw - 6}" height="${bh}" fill="${BINS[i] >= 1 ? "#51DA4C" : "#C9C9C9"}"/><text x="${X + bw / 2}" y="${h - 36 - bh}" text-anchor="middle" class="cv">${n}</text><text x="${X + bw / 2}" y="${h - 12}" text-anchor="middle" class="cl">${NARROW ? (BINS[i + 1] === Infinity ? "$3+" : R(BINS[i]).replace(".00", "")) : binLab(i)}</text>`; }).join("");
     const mark = (v, lab, left) => `<line x1="${x(v)}" x2="${x(v)}" y1="4" y2="${h - 30}" stroke="#0A0A0A" stroke-width="1.5" stroke-dasharray="${left ? "4 3" : "0"}"/><text x="${x(v) + (left ? -6 : 6)}" y="12" text-anchor="${left ? "end" : "start"}" class="cm">${lab}</text>`;
     return `<figure class="chart"><svg viewBox="0 0 ${W} ${h}" role="img" aria-label="Bar chart: number of counties by dollars back per $1. ${above1} of ${OK.length} counties get $1 or more back.">${bars}${mark(FM.MED, "typical county " + R(FM.MED), false)}${mark(FM.US, "U.S. overall " + R(FM.US), true)}</svg>
       <figcaption>Counties by dollars back per $1 of federal tax. Green bars: $1 or more.</figcaption>${table("Counties by dollars back per $1", ["Back per $1", "Counties"], hist.map((n, i) => [binLab(i), FM.int(n)]))}</figure>`;
@@ -239,7 +241,7 @@
         <div class="bigfact"><span class="giant">${N50}</span><span>counties received <b>half of all federal contract dollars</b> (${M(T.con / 2)} of ${M(T.con)}). The other half was spread across ${FM.int(byCon.length - N50)}.</span></div></div>
     </div>
     <div class="grid phone-hide">
-      <div class="cell s4"><h2 class="t">Five years of federal money</h2><div id="home-change">${changeChart(200)}</div></div>
+      <div class="cell s4"><h2 class="t">Five years of federal money</h2><div id="home-change">${changeChart(330)}</div></div>
       <div class="cell s4"><h2 class="t">Most back per $1: bases, labs and shipyards</h2>${extremeList(top.slice(0, 4))}</div>
       <div class="cell s4"><h2 class="t">Least back per $1: high-income suburbs and resorts</h2>${extremeList(bottom.slice(0, 4))}</div>
     </div>
@@ -259,19 +261,21 @@
     <div class="grid">
       <div class="cell s7" id="an-spread"><p class="label">1 · The spread</p><h2 class="t">${FM.int(above1)} of ${FM.int(OK.length)} counties with a figure get $1 or more back</h2>${histChart(240)}</div>
       <div class="cell s5 white"><p class="label">Reading it</p><p class="lead" style="margin-top:10px">The typical county gets <b>${R(FM.MED)}</b> back per $1, but the U.S. overall is only <b>${R(FM.US)}</b>. That gap is the story: a few high-income places pay a large share of federal taxes, so they get back much less per dollar — and pull the national figure down.</p>
-        <p class="small" style="margin-top:14px">${big.length} counties have a million or more residents; together they get back ${R(sum(big, c => c.money) / sum(big, c => c.taxes))} per $1.</p></div>
+        <p class="small" style="margin-top:14px">${big.length} counties have a million or more residents; together they get back ${R(sum(big, c => c.money) / sum(big, c => c.taxes))} per $1.</p>
+        <div class="pair"><div><span class="label">Typical county</span><b>${R(FM.MED)}</b></div><div><span class="label">U.S. overall</span><b>${R(FM.US)}</b></div></div></div>
     </div>
     <div class="grid">
       <div class="cell s7" id="an-pp"><p class="label">2 · Per person</p><h2 class="t">What residents paid vs. what came back, per person</h2>${scatter()}</div>
       <div class="cell s5 white"><p class="label">Reading it</p><p class="lead" style="margin-top:10px">Counties to the right pay more federal tax per person — mostly because their residents earn more. Counties higher up receive more per person — often because more residents are retired, or because federal work happens there.</p>
-        <p class="small" style="margin-top:14px">The dashed line is $1 back for every $1 paid. Most green dots sit to the left: lower taxes per person, not unusually high spending.</p></div>
+        <p class="small" style="margin-top:14px">The dashed line is $1 back for every $1 paid. Most green dots sit to the left: lower taxes per person, not unusually high spending.</p>
+        <div class="pair"><div><span class="label">Typical county got back</span><b>${FM.whole(medOf(OK.map(c => c.money / c.pop)))}</b></div><div><span class="label">and paid</span><b>${FM.whole(medOf(OK.map(c => c.taxes / c.pop)))}</b></div></div><p class="small" style="margin-top:8px">per resident, in the middle county for each</p></div>
     </div>
     <div class="grid">
       <div class="cell s12" id="an-who"><p class="label">3 · Who pays, who gets</p><h2 class="t">The tenth of Americans in the highest-tax counties pays ${FM.pct(tenths[9].taxShare)} of federal taxes and receives ${FM.pct(tenths[9].moneyShare)} of the money</h2>${whoChart()}</div>
     </div>
     <div class="grid">
-      <div class="cell s6" id="an-type"><p class="label">4 · By type</p><h2 class="t">What kind of money came back</h2>${typeChart()}</div>
-      <div class="cell s6"><p class="label">By county size</p><h2 class="t">Smaller counties rely more on Social Security</h2>${sizeChart()}</div>
+      <div class="cell s5" id="an-type"><p class="label">4 · By type</p><h2 class="t">What kind of money came back</h2>${typeChart()}</div>
+      <div class="cell s7"><p class="label">By county size</p><h2 class="t">Smaller counties rely more on Social Security</h2>${sizeChart()}</div>
     </div>
     <div class="grid">
       <div class="cell s8" id="an-conc"><p class="label">5 · Concentration</p><h2 class="t">Half of all contract dollars went to ${N50} counties</h2>${concChart(240)}</div>
@@ -315,12 +319,12 @@
     <div class="grid"><div class="cell s12 formula" aria-label="Money in divided by taxes paid equals dollars back per $1">
       <div><span class="label">Money in</span><b style="color:var(--ink)">${M(T.money)}</b></div><span class="op">÷</span><div><span class="label">Taxes paid</span><b>${M(T.tax)}</b></div><span class="op">=</span><div class="res"><span class="label">Back per $1 · U.S.</span><b>${R(FM.US)}</b></div></div></div>
     <div class="grid">
-      <div class="cell s4"><p class="step">1</p><h2 class="t">Money in</h2><p class="small" style="margin-top:8px">Every federal <b>contract, grant and Social Security &amp; SSI payment</b> committed in fiscal year 2023 (Oct 2022–Sep 2023), credited to the county <b>where the work or payment happens</b> — not where the company or agency is based. We count the main award only, never the sub-awards inside it, so nothing is counted twice.</p>
+      <div class="cell s5"><p class="step">1</p><h2 class="t">Money in</h2><p class="small" style="margin-top:8px">Every federal <b>contract, grant and Social Security &amp; SSI payment</b> committed in fiscal year 2023 (Oct 2022–Sep 2023), credited to the county <b>where the work or payment happens</b> — not where the company or agency is based. We count the main award only, never the sub-awards inside it, so nothing is counted twice.</p>
         <p class="small" style="margin-top:8px">About three-quarters of grant dollars (mostly Medicaid) go to states with no county attached. Each county gets a share <b>based on the people each program serves</b>: Medicaid by residents with Medicaid coverage, school and child programs by children, TANF and child care by people in poverty, food programs by households on SNAP, the rest by population (Census Bureau). These are marked “est.”</p>
         <p class="small" style="margin-top:8px">Four nationwide health-benefit contracts — veterans' community care and TRICARE, ${M(sum(ALL, c => c.national))} in all — are booked to the contractor's office county. They're shown separately as “national programs” and not counted for that county.</p></div>
       <div class="cell s4"><p class="step">2</p><h2 class="t">Taxes paid</h2><p class="small" style="margin-top:8px">We start from the U.S. Treasury's fiscal 2023 total ($4.44 trillion) and share 97% of it out to counties:</p>
         <ul class="small bul"><li><b>Income tax</b> — by each county's share in IRS county data (measured).</li><li><b>Payroll taxes</b> — by an estimate of each county's taxable wages, with the Social Security wage cap applied.</li><li><b>Corporate tax</b> — 75% by investment income, 25% by wages.</li><li><b>Estate tax</b> by investment income; <b>excise taxes</b> by population.</li><li><b>Customs and other receipts</b> (2.7%) aren't assigned to any county.</li></ul></div>
-      <div class="cell s4"><p class="step">3</p><h2 class="t">Divide</h2><p class="small" style="margin-top:8px">Money in ÷ taxes paid = <b>dollars back per $1</b>. We compare each county with the <b>typical county</b> (${R(FM.MED)}), the one in the middle. The <b>U.S. overall</b> figure (${R(FM.US)}) adds everything up, so a few high-tax places weigh heavily on it.</p>
+      <div class="cell s3"><p class="step">3</p><h2 class="t">Divide</h2><p class="small" style="margin-top:8px">Money in ÷ taxes paid = <b>dollars back per $1</b>. We compare each county with the <b>typical county</b> (${R(FM.MED)}), the one in the middle. The <b>U.S. overall</b> figure (${R(FM.US)}) adds everything up, so a few high-tax places weigh heavily on it.</p>
         <p class="small" style="margin-top:8px">It is under $1 nationally because Medicare, federal salaries, defense overhead and interest on the debt aren't tied to a county here.</p></div>
     </div>
     <div class="grid"><div class="cell s12 white"><p class="label">Worked example</p><h2 class="t">Franklin County, Ohio</h2>
@@ -343,10 +347,10 @@
         <li>Other nationally run contracts may still be booked at one office; counties where contracts dominate are flagged.</li>
         <li>Taxes other than income tax are estimates. Connecticut reports 9 planning regions instead of counties.</li></ul></div>
     </div>
-    <div class="grid"><div class="cell s6 white" id="how-version"><p class="label">Data version</p><h2 class="t">Version ${FM.VERSION}</h2>
+    <div class="grid"><div class="cell s5 white" id="how-version"><p class="label">Data version</p><h2 class="t">Version ${FM.VERSION}</h2>
         <p class="small" style="margin-top:8px">${FM.DATA_NOTE}. Agencies correct past spending every month, so each release keeps its version number and date; cite the version you used.</p>
         <p class="small" style="margin-top:8px">${FM.int(FM.ALL.length)} counties and county-equivalents; ${FM.int(FM.N)} have a dollars-back figure (Kalawao, HI is reported by the IRS together with Maui).</p></div>
-      <div class="cell s6"><p class="label">Changes</p><ul class="checks changes">
+      <div class="cell s7"><p class="label">Changes</p><ul class="checks changes">
         <li><b>0.5</b>Statewide grants shared by need (Medicaid coverage, children, poverty, SNAP); nationwide health-benefit contracts moved to their own line · Nov 5, 2026</li>
         <li><b>0.4</b>Who got the money (live from USAspending), citations, footer, phone layout · Nov 5, 2026</li>
         <li><b>0.3</b>Analytics page, method page, map filters by population and dollars back · Nov 5, 2026</li>
@@ -384,26 +388,29 @@
       <a class="cell s4 cta green" href="#/"><span class="label" style="color:var(--ink)">Start</span><span class="ctat">Find your county →</span></a></div>`;
   };
 
-  // ---------- Tidy pass (applies to Home, Analytics, Method, About)
-  // - Eyebrows: only the page-top one stays; small labels sitting above a heading are removed (labels that name
-  //   a number or a list stay, since they say what it is). Step counters go too.
-  // - Subtext: explanation paragraphs in each tile fold into one "More" toggle; "Reading it" notes on Analytics
-  //   move under their chart as "What this shows".
+  // ---------- Tidy pass
+  // - Eyebrows (Home, Analytics): only the page-top one stays; small labels sitting above a heading are removed
+  //   (labels that name a number or list stay, since they say what it is).
+  // - Phone folds: long explanations fold behind a button on phones only; on wider screens they stay open, so
+  //   desktop layouts keep their text and don't leave holes. Short, useful notes are never folded.
+  const phoneQ = matchMedia("(max-width: 760px)"), folds = [];
+  const syncFolds = () => folds.forEach(d => d.open = !phoneQ.matches);
+  phoneQ.addEventListener("change", syncFolds);
   const fold = (nodes, label) => { if (!nodes.length) return; const d = document.createElement("details"); d.className = "more";
-    d.innerHTML = `<summary>${label}</summary>`; nodes[0].before(d); nodes.forEach(n => d.appendChild(n)); };
+    d.innerHTML = `<summary>${label}</summary>`; nodes[0].before(d); nodes.forEach(n => d.appendChild(n)); folds.push(d); d.open = !phoneQ.matches; };
   const isHead = n => n && /^H[1-3]$/.test(n.tagName);
   V3.tidy = view => {
-    const grids = [...view.querySelectorAll(".grid")], top = grids[0];
-    view.querySelectorAll("p.label").forEach(l => { if (top && top.contains(l)) return;
+    const top = view.querySelector(".grid");
+    view.querySelectorAll("p.label").forEach(l => { if (top && top.contains(l) || l.textContent.trim() === "Reading it") return;
       const n = l.nextElementSibling; if (!l.textContent.trim() || isHead(n) || (n && isHead(n.firstElementChild))) l.remove(); });
-    view.querySelectorAll(".step").forEach(s => { if (!top || !top.contains(s)) s.remove(); });
-    // Analytics "Reading it" tiles → under the chart next to them
-    view.querySelectorAll(".cell").forEach(c => { const l = c.firstElementChild; if (!l || !l.matches("p.label") || l.textContent.trim() !== "Reading it") return;
-      const chart = c.previousElementSibling; l.remove(); const kids = [...c.children]; if (!chart) return;
-      chart.append(...kids); fold(kids, "What this shows"); chart.className = chart.className.replace(/\bs\d+\b/, "s12") + " solo"; c.remove(); });
-    view.querySelectorAll(".cell").forEach(c => { if (top && top.contains(c)) return;
-      const prose = [...c.children].filter(n => n.matches("p.small, p.lead") && !n.closest("details")); fold(prose, "More"); });
   };
+  // Analytics: each chart's "Reading it" tile becomes "What this shows" (open beside the chart on desktop; a button under it on phones).
+  V3.foldReading = view => view.querySelectorAll(".cell").forEach(c => { const l = c.firstElementChild;
+    if (!l || !l.matches("p.label") || l.textContent.trim() !== "Reading it") return;
+    l.textContent = "What this shows"; c.classList.add("reading"); fold([...c.children].slice(1), "What this shows"); });
+  // Method: on phones, each step keeps its first paragraph; the rest folds.
+  V3.foldExtras = view => view.querySelectorAll(".cell").forEach(c => { if (view.querySelector(".grid").contains(c)) return;
+    const prose = [...c.children].filter(n => n.matches("p.small")); fold(prose.slice(1), "More"); });
 
   // Analytics on phones: each section is a row that opens on tap (open on wider screens).
   V3.sections = el => {
@@ -421,7 +428,7 @@
   // re-render change charts once years.js arrives (or on show)
   V3.onShow = view => {
     if (!window.YEARS) return;
-    const h = document.getElementById("home-change"); if (h && !h.dataset.done) { h.innerHTML = changeChart(200); h.dataset.done = 1; }
+    const h = document.getElementById("home-change"); if (h && !h.dataset.done) { h.innerHTML = changeChart(330); h.dataset.done = 1; }
     const a = document.getElementById("an-change-body"); if (a && !a.dataset.done) { a.innerHTML = changeChart(260) + movers(); a.dataset.done = 1; }
   };
 })();

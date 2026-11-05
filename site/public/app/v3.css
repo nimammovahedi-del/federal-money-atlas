@@ -365,21 +365,43 @@ nav.main .short{display:none}
   .chart figcaption{font-size:13px}
 }
 
-/* ---------- tidy pass: "More" toggles and phone section rows */
-details.more{margin-top:12px}
-details.more>summary{display:inline-flex;align-items:center;gap:6px;cursor:pointer;list-style:none;font:600 13px var(--sans);color:var(--mute);padding:4px 0}
-details.more>summary::-webkit-details-marker,details.an-sec>summary::-webkit-details-marker{display:none}
-details.more>summary::after{content:"+";font:600 15px var(--mono);line-height:1}
-details.more[open]>summary::after{content:"−"}
-details.more>summary:hover{color:var(--ink)}
-details.more>*:not(summary){margin-top:8px}
-.cell.solo .chart svg{max-width:760px}
+/* ---------- tidy pass: phone-only folds, data buttons, phone section rows */
+.cell{padding:28px}
+details.more>summary::-webkit-details-marker,details.an-sec>summary::-webkit-details-marker,.dt>summary::-webkit-details-marker{display:none}
+details.more>summary{display:none}                      /* wider screens: always open, no button */
+/* "Show the data": a real button, not grey small print */
+.dt{margin-top:14px}
+.dt>summary{display:inline-flex;align-items:center;gap:8px;list-style:none;cursor:pointer;height:34px;padding:0 12px;border:1.5px solid var(--ink);background:var(--white);color:var(--ink);font:700 12px var(--sans);letter-spacing:.08em;text-transform:uppercase}
+.dt>summary::after{content:"+";font:700 15px var(--mono)}
+.dt[open]>summary{background:var(--ink);color:var(--white)}.dt[open]>summary::after{content:"−"}
+.dt>summary:hover{background:var(--green)}
+.cell.reading>p.label{color:var(--ink)}
+.cell.reading{display:flex;flex-direction:column}.cell.reading>details.more{flex:1;display:flex;flex-direction:column}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:auto}
+.reading details.more>.pair{margin-top:auto}
+.reading details.more>p:has(+ .pair){margin-bottom:24px}
+.pair>div{background:var(--bg);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.pair b{font:800 34px/1 var(--sans);letter-spacing:-.03em}.pair>div:first-child{background:var(--green)}.pair>div:first-child .label{color:var(--ink)}
 details.an-sec>summary{display:none}
 @media (max-width:760px){
+  .cell{padding:18px 16px}
+  /* phones: explanations sit behind a full-width button; opening it fills the space below */
+  .cell.reading>p.label{display:none}
+  .cell.reading{padding-top:0;padding-bottom:16px}
+  details.more>summary{display:flex;justify-content:space-between;align-items:center;list-style:none;cursor:pointer;width:100%;padding:12px 14px;border:1.5px solid var(--ink);background:var(--white);font:700 13px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+  details.more>summary::after{content:"+";font:700 18px var(--mono)}
+  details.more[open]>summary{background:var(--green)}details.more[open]>summary::after{content:"−"}
+  details.more[open]{border:1.5px solid var(--ink);background:var(--white)}
+  details.more[open]>summary{border:0;border-bottom:1.5px solid var(--ink)}
+  details.more[open]>*:not(summary){margin:12px 14px}
+  details.more[open]>*:not(summary):last-child{margin-bottom:14px}
+  details.more{margin-top:14px}
+  .dt>summary{width:100%;justify-content:space-between;height:44px}
   #v-analytics .toc{display:none}
   details.an-sec>summary{display:flex;justify-content:space-between;align-items:center;cursor:pointer;list-style:none;
-    padding:18px 16px;border-top:1px solid var(--line,#E2E2E2);font:700 18px var(--sans);letter-spacing:-.01em;background:#fff}
+    padding:18px 16px;border-top:1px solid var(--line);font:700 18px var(--sans);letter-spacing:-.01em;background:var(--white)}
   details.an-sec>summary::after{content:"+";font:600 20px var(--mono)}
+  details.an-sec[open]>summary{background:var(--green)}
   details.an-sec[open]>summary::after{content:"−"}
-  details.an-sec:last-of-type{border-bottom:1px solid var(--line,#E2E2E2)}
+  details.an-sec:last-of-type{border-bottom:1px solid var(--line)}
 }

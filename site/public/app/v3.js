@@ -281,7 +281,8 @@
   window.V3.analytics($("#v-analytics"), pat);
   window.V3.how($("#v-how"), pat);
   window.V3.about($("#v-about"), pat);
-  ["#v-home", "#v-analytics", "#v-how", "#v-about"].forEach(s => window.V3.tidy($(s)));
+  ["#v-home", "#v-analytics"].forEach(s => window.V3.tidy($(s)));
+  window.V3.foldReading($("#v-analytics")); window.V3.foldExtras($("#v-how"));
   window.V3.sections($("#v-analytics"));
 
   // ---------- start
