@@ -40,7 +40,7 @@
   const SHELL = `
   <a class="skip" href="#main">Skip to content</a>
   <header class="top no-print"><a class="brand" href="#/"><i aria-hidden="true"><b></b><b></b><b></b><b></b></i>Federal Money Atlas</a>
-    <nav class="main" aria-label="Main"><a href="#/" data-nav="home" class="nav-home">Home</a><a href="#/map" data-nav="map">Map</a><a href="#/analytics" data-nav="analytics">Analytics</a><a href="#/list" data-nav="list">Counties</a><a href="#/compare" data-nav="compare">Compare</a><a href="#/how" data-nav="how"><span class="long">How it works</span><span class="short">Method</span></a><a href="#/about" data-nav="about">About</a></nav></header>
+    <nav class="main" aria-label="Main"><a href="#/" data-nav="home" class="nav-home">Home</a><a href="#/map" data-nav="map">Map</a><a href="#/analytics" data-nav="analytics">Analytics</a><a href="#/list" data-nav="list">Counties</a><a href="#/compare" data-nav="compare">Compare</a><a href="#/how" data-nav="how">Method</a><a href="#/about" data-nav="about">About</a></nav></header>
   <main id="main" tabindex="-1">
     <section data-view="home" id="v-home" aria-labelledby="h-home"></section>
     <section data-view="map" hidden class="mapview" aria-labelledby="map-title"></section>
@@ -55,7 +55,7 @@
     <div class="cell s4"><a class="brand" href="#/"><i aria-hidden="true"><b></b><b></b><b></b><b></b></i>Federal Money Atlas</a>
       <p class="small" style="margin-top:12px">Where federal money lands, county by county. Fiscal year ${FM.FY} · data as of ${FM.ASOF} · version ${FM.VERSION || "0.4 prototype"}.</p>
       <p class="small" style="margin-top:8px">A prototype — not yet published.</p></div>
-    <div class="cell s4"><p class="label">Explore</p><ul class="flinks"><li><a href="#/map">Map</a></li><li><a href="#/analytics">Analytics</a></li><li><a href="#/list">Every county</a></li><li><a href="#/compare">Compare</a></li><li><a href="#/how">How it works</a></li><li><a href="#/about">About</a></li></ul></div>
+    <div class="cell s4"><p class="label">Explore</p><ul class="flinks"><li><a href="#/map">Map</a></li><li><a href="#/analytics">Analytics</a></li><li><a href="#/list">Every county</a></li><li><a href="#/compare">Compare</a></li><li><a href="#/how">Method</a></li><li><a href="#/about">About</a></li></ul></div>
     <div class="cell s4"><p class="label">Data</p><ul class="flinks"><li><a href="#/how">Sources &amp; method</a></li><li><button type="button" class="linkbtn" id="foot-dl" style="margin:0">Download all counties (CSV)</button></li><li><a href="#/how" onclick="setTimeout(()=>document.getElementById('how-version')?.scrollIntoView(),400)">Data version &amp; changes</a></li><li><span class="small">Report an error — a public issue tracker opens at launch</span></li></ul>
       <p class="small" style="margin-top:12px">Public data from USAspending.gov, IRS, U.S. Treasury and the Census Bureau.</p></div>
   </div></footer>
@@ -105,7 +105,7 @@
           <p class="small" id="m-viewnote" style="margin-top:10px"></p></fieldset>
       </aside>
       <button class="drawer-tab" id="drawer-tab" aria-controls="drawer" aria-expanded="true" aria-label="Hide map options"><span aria-hidden="true" id="tab-arrow">‹</span></button>
-      <div class="mapholder" id="map2"></div>
+      <div class="mapholder" id="map2"><p class="small map-loading" style="padding:24px">Loading map…</p></div>
     </div>`;
   const setDrawer = open => { $("#stage").classList.toggle("closed", !open); $("#drawer-tab").setAttribute("aria-expanded", open);
     $("#tab-arrow").textContent = open ? "‹" : "›"; $("#drawer-tab").setAttribute("aria-label", open ? "Hide map options" : "Show map options"); $("#drawer").inert = !open; };
@@ -285,11 +285,11 @@
 
   // ---------- start
   const routes = { county, list, compare, map: () => { if (phone.matches) setDrawer(false); mapUpdate(); setTimeout(() => $("#map-title").focus({ preventScroll: true }), 0); }, analytics: () => window.V3.onShow("analytics"), home: () => window.V3.onShow("home") };
-  const makeBig = () => { if (!bigMap) { bigMap = FM.makeMap($("#map2"), { label: "Map of U.S. counties. Use the options panel to filter; use the county list for a text version." }); mapUpdate(); } };
+  const makeBig = () => { if (!bigMap) { $("#map2 .map-loading")?.remove(); bigMap = FM.makeMap($("#map2"), { label: "Map of U.S. counties. Use the options panel to filter; use the county list for a text version." }); mapUpdate(); } };
   const PAGE = document.body.dataset.page;
   if (FM.MULTI) {
     // Only the map, county and compare pages need the county shapes (~800 KB); everything else shows at once.
     FM.route(routes);
-    if (PAGE === "map") FM.loadGeometry().then(makeBig); else if (PAGE === "compare") FM.loadGeometry();
+    if (PAGE === "map") FM.loadGeometry().then(() => { makeBig(); setTimeout(FM.geo.warm, 400); }); else if (PAGE === "compare") FM.loadGeometry();
   } else FM.loadGeometry().then(() => { makeBig(); FM.route(routes); });
 })();

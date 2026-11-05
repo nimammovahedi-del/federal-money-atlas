@@ -290,7 +290,7 @@
     <div class="grid">
       <div class="cell s12 ${window.YEARS ? "" : "phone-hide"}" id="an-change"><p class="label">8 · Change</p><h2 class="t">Five years of federal money to counties</h2><div id="an-change-body">${changeChart(260)}${movers()}</div></div>
     </div>
-    <div class="grid"><div class="cell s8 white" id="an-dl"><p class="label">9 · Download</p><h2 class="t">Every county's numbers in one file</h2><p class="small" style="margin-top:8px">${FM.int(ALL.length)} counties: population, money in by type, estimated taxes and dollars back per $1. Free to use; please cite the sources on <a href="#/how">How it works</a>.</p></div>
+    <div class="grid"><div class="cell s8 white" id="an-dl"><p class="label">9 · Download</p><h2 class="t">Every county's numbers in one file</h2><p class="small" style="margin-top:8px">${FM.int(ALL.length)} counties: population, money in by type, estimated taxes and dollars back per $1. Free to use; please cite the sources on <a href="#/how">Method</a>.</p></div>
       <div class="cell s4 green cta" style="cursor:pointer" role="button" tabindex="0" id="dl-all"><span class="label" style="color:var(--ink)">CSV · ${FM.int(ALL.length)} rows</span><span class="ctat">Download all counties ↓</span></div></div>
     <p class="foot">Money in: USAspending.gov obligations by place of performance. Taxes: IRS county data plus estimates scaled to Treasury totals. See <a href="#/how">how it works</a>.</p>`;
     V3.wireAnalytics(el);
@@ -310,7 +310,7 @@
       ["Medicare Geographic Variation", "CMS", "Medicare spending by county (shown for context, not counted)", "2023", "https://data.cms.gov/"],
       ["“Giving or Getting?” (2025)", "Rockefeller Institute", "State-level estimates used to check our totals", "FFY2023", "https://rockinst.org/"]];
     el.innerHTML = `
-    <div class="grid"><div class="cell s8 white"><p class="label">How it works</p><h1 id="h-how">How the numbers are calculated</h1>
+    <div class="grid"><div class="cell s8 white"><p class="label">Method</p><h1 id="h-how">How the numbers are calculated</h1>
       <p class="lead">One division, done the same way for every county. Here is each step, where the data comes from, what is estimated, and how we checked it.</p></div>${pat("s4", 307)}</div>
     <div class="grid"><div class="cell s12 formula" aria-label="Money in divided by taxes paid equals dollars back per $1">
       <div><span class="label">Money in</span><b style="color:var(--ink)">${M(T.money)}</b></div><span class="op">÷</span><div><span class="label">Taxes paid</span><b>${M(T.tax)}</b></div><span class="op">=</span><div class="res"><span class="label">Back per $1 · U.S.</span><b>${R(FM.US)}</b></div></div></div>

@@ -196,23 +196,34 @@
     const feats = topojson.feature(us, us.objects.counties).features, path = d3.geoPath();
     const byId = Object.fromEntries(feats.map(f => [f.id, f])), byIndex = {}; feats.forEach((f, i) => byIndex[f.id] = i);
     const neigh = topojson.neighbors(us.objects.counties.geometries);
+    FM.geo = { us, feats, byId, byIndex, neigh, path,
+      states: topojson.mesh(us, us.objects.states, (a, b) => a !== b), nation: topojson.mesh(us, us.objects.nation),
+      nationFill: topojson.feature(us, us.objects.nation), layouts: () => FM.geo.dots || layouts(feats, path), warm: () => warm() };
+    return FM.geo;
+  }));
+  // People (circles sized by residents) and Grid (equal squares) layouts: about 1 s of work. It runs in small
+  // slices in the background after the map shows (FM.geo.warm), or all at once if someone opens those views first.
+  function* layoutSteps(feats, path) {
     const dots = feats.filter(f => FM.C[f.id]).map(f => { const [x, y] = path.centroid(f); return { id: f.id, x0: x, y0: y, x, y, r: Math.max(.7, .0128 * Math.sqrt(FM.C[f.id].pop)) }; }).filter(n => isFinite(n.x0));
     const sim = d3.forceSimulation(dots).force("x", d3.forceX(d => d.x0).strength(.12)).force("y", d3.forceY(d => d.y0).strength(.12)).force("c", d3.forceCollide(d => d.r + .35).iterations(2)).stop();
-    for (let i = 0; i < 160; i++) sim.tick();
+    for (let i = 0; i < 160; i++) { sim.tick(); if (i % 4 === 3) yield; }
     const S = 15, cells = {};
     for (const n of dots) { const k = Math.floor(n.x0 / S) + "," + Math.floor(n.y0 / S); (cells[k] ||= { x: Math.floor(n.x0 / S) * S, y: Math.floor(n.y0 / S) * S, s: S, ids: [] }).ids.push(n.id); }
     const boxes = feats.filter(f => FM.C[f.id]).map(f => ({ f, b: path.bounds(f) }));
     const rings = f => (f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates).map(p => p[0]);
-    for (let gx = 0; gx * S < 975; gx++) for (let gy = 0; gy * S < 610; gy++) {
+    for (let gx = 0; gx * S < 975; gx++) { for (let gy = 0; gy * S < 610; gy++) {
       const k = gx + "," + gy; if (cells[k]) continue; const cx = gx * S + S / 2, cy = gy * S + S / 2;
       const hit = boxes.find(({ f, b }) => cx >= b[0][0] && cx <= b[1][0] && cy >= b[0][1] && cy <= b[1][1] && rings(f).some(r => d3.polygonContains(r, [cx, cy])));
       if (hit) cells[k] = { x: gx * S, y: gy * S, s: S, ids: [hit.f.id] };
-    }
-    FM.geo = { us, feats, byId, byIndex, neigh, dots, cells: Object.values(cells), path,
-      states: topojson.mesh(us, us.objects.states, (a, b) => a !== b), nation: topojson.mesh(us, us.objects.nation),
-      nationFill: topojson.feature(us, us.objects.nation) };
-    return FM.geo;
-  }));
+    } if (gx % 3 === 2) yield; }
+    FM.geo.dots = dots; FM.geo.cells = Object.values(cells);
+  }
+  let steps = null;
+  const layouts = (feats, path) => { steps ||= layoutSteps(feats, path); while (!steps.next().done); };
+  const warm = () => { if (FM.geo.dots) return; steps ||= layoutSteps(FM.geo.feats, FM.geo.path);
+    const later = window.requestIdleCallback || (f => setTimeout(f, 30));
+    const slice = () => { if (FM.geo.dots) return; const t = performance.now(); while (performance.now() - t < 12) if (steps.next().done) return; later(slice); };
+    later(slice); };
   FM.neighbors = c => { const g = FM.geo, i = g && g.byIndex[c.fips]; return i == null ? [] : g.neigh[i].map(j => FM.C[g.feats[j].id]).filter(Boolean); };
 
   // ---------- tooltip (one per page)
@@ -235,8 +246,11 @@
     const on = sel => sel.on("mousemove", (ev, d) => FM.tip(ev, tipFor(d.ids || [d.id]))).on("mouseleave", () => FM.tip(null))
       .on("click", (ev, d) => { const ids = d.ids || [d.id]; if (FM.C[ids[0]]) api.pick(ids); });
     const land = svg.append("g"), paths = on(land.selectAll("path").data(g.feats.filter(f => FM.C[f.id])).join("path").attr("d", g.path).attr("stroke", st.bg).attr("stroke-width", .15).attr("class", "fm-hit"));
-    const people = svg.append("g").style("display", "none"), dots = on(people.selectAll("circle").data(g.dots).join("circle").attr("cx", d => d.x).attr("cy", d => d.y).attr("r", d => d.r).attr("stroke", st.bg).attr("stroke-width", .3).attr("class", "fm-hit"));
-    const grid = svg.append("g").style("display", "none"), rects = on(grid.selectAll("rect").data(g.cells).join("rect").attr("x", d => d.x + .7).attr("y", d => d.y + .7).attr("width", d => d.s - 1.4).attr("height", d => d.s - 1.4).attr("class", "fm-hit"));
+    const people = svg.append("g").style("display", "none"), grid = svg.append("g").style("display", "none");
+    let dots = null, rects = null;
+    const buildAlt = () => { if (dots) return; g.layouts();
+      dots = on(people.selectAll("circle").data(g.dots).join("circle").attr("cx", d => d.x).attr("cy", d => d.y).attr("r", d => d.r).attr("stroke", st.bg).attr("stroke-width", .3).attr("class", "fm-hit"));
+      rects = on(grid.selectAll("rect").data(g.cells).join("rect").attr("x", d => d.x + .7).attr("y", d => d.y + .7).attr("width", d => d.s - 1.4).attr("height", d => d.s - 1.4).attr("class", "fm-hit")); };
     const borders = svg.append("path").attr("d", g.path(g.states)).attr("fill", "none").attr("stroke", st.bg).attr("stroke-width", 1.1).style("pointer-events", "none");
     const labels = svg.append("g").style("display", "none").style("pointer-events", "none");
     for (const [n, lon, lat] of CITIES) { const p = proj([lon, lat]); if (!p) continue; const t = labels.append("g").attr("transform", `translate(${p[0]},${p[1]})`);
@@ -263,9 +277,9 @@
         sheet.querySelector(".fm-close").onclick = () => { sheet.hidden = true; st.picked = null; api.select(null); };
         opt.onPick && opt.onPick(ids); },
       state: st,
-      recolor() { paths.attr("fill", d => FM.colorOf([FM.C[d.id]], st.kind, st.size)); dots.attr("fill", d => FM.colorOf([FM.C[d.id]], st.kind, st.size));
+      recolor() { paths.attr("fill", d => FM.colorOf([FM.C[d.id]], st.kind, st.size)); if (!dots) return api; dots.attr("fill", d => FM.colorOf([FM.C[d.id]], st.kind, st.size));
         rects.attr("fill", d => FM.colorOf(d.ids.map(i => FM.C[i]), st.kind, st.size)); return api; },
-      set(o) { Object.assign(st, o); land.style("display", st.view === "land" ? null : "none"); people.style("display", st.view === "people" ? null : "none");
+      set(o) { Object.assign(st, o); if (st.view !== "land") buildAlt(); land.style("display", st.view === "land" ? null : "none"); people.style("display", st.view === "people" ? null : "none");
         grid.style("display", st.view === "grid" ? null : "none"); labels.style("display", st.view === "land" ? "none" : null);
         borders.style("display", st.view === "people" ? "none" : null); api.recolor(); api.select(st.sel);
         if (st.picked && !sheet.hidden) { sheet.innerHTML = sheetHTML(st.picked); sheet.querySelector(".fm-close").onclick = () => { sheet.hidden = true; st.picked = null; api.select(null); }; }
@@ -305,7 +319,7 @@
       const pre = document.getElementById("static"); if (pre) pre.remove();   // static (no-JS / search engine) version gives way to the interactive one
       handlers[view] && handlers[view](parts[1], new URLSearchParams(q || ""));
       const c = view === "county" && FM.C[parts[1]];
-      document.title = (c ? `${c.name}, ${c.st}` : { list: "Every county", compare: "Compare counties", about: "About", map: "Map", analytics: "Analytics", how: "How it works", home: "" }[view] || "") .replace(/^(.+)$/, "$1 · ") + "Federal Money Atlas";
+      document.title = (c ? `${c.name}, ${c.st}` : { list: "Every county", compare: "Compare counties", about: "About", map: "Map", analytics: "Analytics", how: "Method", home: "" }[view] || "") .replace(/^(.+)$/, "$1 · ") + "Federal Money Atlas";
       FM._inputs.forEach(i => { if (document.activeElement !== i) i.value = ""; });
       if (view !== "home" && moved) { const h = document.querySelector(`[data-view="${view}"] h1`); if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); } }
       moved = true;
