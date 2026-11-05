@@ -233,10 +233,10 @@ def need_measures(counties):
     return m
 
 
-def statewide_grants_by_need(counties, sw):
+def statewide_grants_by_need(counties, sw, fy=FISCAL_YEAR):
     """Share each state's no-county grants among its counties, program by program."""
     m = need_measures(counties)
-    progs = pd.read_csv(INTERIM / f"usaspending_fy{FISCAL_YEAR}_no_county_programs.csv", dtype=str, keep_default_na=False)
+    progs = pd.read_csv(INTERIM / f"usaspending_fy{fy}_no_county_programs.csv", dtype=str, keep_default_na=False)
     progs["obligation"] = progs.obligation.astype(float)
     progs = progs[(progs.category == "grants") & progs.state.isin(ABBR_TO_FIPS)]
     code_to_group = {code: g for g, codes in PROGRAM_NEED.items() for code in codes}
@@ -256,8 +256,8 @@ def statewide_grants_by_need(counties, sw):
     return out.values, mix
 
 
-def national_programs():
-    path = REFERENCE / f"national_programs_fy{FISCAL_YEAR}.csv"
+def national_programs(fy=FISCAL_YEAR):
+    path = REFERENCE / f"national_programs_fy{fy}.csv"
     if not path.exists():
         return {}
     d = pd.read_csv(path, dtype={"fips": str})

@@ -51,3 +51,9 @@ print(f"Wrote site/src/data/counties.json ({len(counties):,} counties)")
 subprocess.run([sys.executable, str(ROOT / "scripts" / "make_prototype.py"), "--js"], check=True)
 (SITE / "public" / "app" / "data.js").write_bytes((ROOT / "design" / "rebuild" / "data.js").read_bytes())
 print("Copied data.js to site/public/app/")
+
+# 5-year change (optional): built by make_years.py
+years = ROOT / "design" / "rebuild3" / "years.js"
+if years.exists():
+    (SITE / "public" / "app" / "years.js").write_bytes(years.read_bytes())
+    print("Copied years.js to site/public/app/")

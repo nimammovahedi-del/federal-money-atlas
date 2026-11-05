@@ -7,13 +7,16 @@ build_phase0.py moves these amounts out of the county's contracts into a separat
 "national programs booked here" figure, which is shown but not counted.
 
 Writes data/reference/national_programs_fy{FY}.csv (fips, program, recipient, amount).
-Usage: python national_programs.py
+Usage: python national_programs.py [--fy=YEAR]   (default: the fiscal year in config.py)
 """
 import csv
 import json
+import sys
 import urllib.request
 
 from config import FISCAL_YEAR, REFERENCE
+
+FISCAL_YEAR = next((int(a.split("=")[1]) for a in sys.argv[1:] if a.startswith("--fy=")), FISCAL_YEAR)
 
 PROGRAMS = [
     # (program, recipient search text as USAspending names it)
