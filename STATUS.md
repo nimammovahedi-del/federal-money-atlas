@@ -399,3 +399,9 @@ First time only: `python3 -m venv .venv && .venv/bin/pip install pandas openpyxl
 4. Later: congressional districts, estimated by combining county pieces.
 
 Not done yet: nothing is committed to git (the repo is initialized with a .gitignore that keeps the big raw files out), nothing is published, and no accounts were created.
+
+## 2026-11-05 · Live + glitch fixes
+- Live (unannounced): https://federal-money-atlas.federal-money-atlas2.workers.dev — Cloudflare Worker, auto-deploys on push to GitHub main (site/wrangler.jsonc).
+- Two-tester review fixed: Home flashing over every page (caused jumps), Back/anchor scroll, compare reloads, slider lock, who-tab race, CT neighbor map, list "show more" on Back.
+- Left for later: map options "hide" button sits below the tall panel on phones; map has no zoom/state view; the browser's own "Transition was skipped" console notice.
+- years.js: Site.astro only loads it if site/public/app/years.js exists — after FY2019–2022 finish, run make_years.py and copy it there.
