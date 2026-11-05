@@ -4,7 +4,7 @@
   const V3 = (window.V3 = {});
   const R = FM.r2, M = FM.money, ALL = FM.ALL, OK = ALL.filter(FM.hasRatio);
   const MOB = matchMedia("(max-width: 760px)").matches;   // phones get narrower charts so labels stay readable
-  FM.VERSION = "0.5 prototype"; FM.DATA_NOTE = "USAspending bulk files of Oct 6, 2026 (FY2023); IRS SOI county data, tax year 2023; Census Vintage 2025 and ACS 2019–2023; Treasury MTS FY2023";
+  FM.VERSION = "1.0"; FM.DATA_NOTE = "USAspending bulk files of Oct 6, 2026 (FY2023); IRS SOI county data, tax year 2023; Census Vintage 2025 and ACS 2019–2023; Treasury MTS FY2023";
   const sum = (l, f) => l.reduce((a, c) => a + (f(c) || 0), 0);
   const esc = FM.esc;
 
@@ -380,7 +380,7 @@
       <div class="cell s4"><p class="step">05</p><h3>Free and open</h3><p class="small">No ads, no accounts. Every county's numbers can be downloaded.</p></div>
       ${pat("s4", 401)}
     </div>
-    <div class="grid"><div class="cell s8 white"><p class="label">Status</p><h2 class="t">A prototype, not yet published</h2><p class="small" style="margin-top:8px">Numbers come from public data for fiscal year 2023, with 2019–2022 for change over time. See <a href="#/how">how it works</a> for the full method and its limits.</p></div>
+    <div class="grid"><div class="cell s8 white"><p class="label">Status</p><h2 class="t">Fiscal year 2023 data</h2><p class="small" style="margin-top:8px">Numbers come from public data for fiscal year 2023; five-year change (2019–2023) is being added. See <a href="#/how">how it works</a> for the full method and its limits.</p></div>
       <a class="cell s4 cta green" href="#/"><span class="label" style="color:var(--ink)">Start</span><span class="ctat">Find your county →</span></a></div>`;
   };
 

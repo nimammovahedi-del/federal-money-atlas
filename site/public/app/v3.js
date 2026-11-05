@@ -53,8 +53,7 @@
   </main>
   <footer class="site-foot no-print"><div class="grid">
     <div class="cell s4"><a class="brand" href="#/"><i aria-hidden="true"><b></b><b></b><b></b><b></b></i>Federal Money Atlas</a>
-      <p class="small" style="margin-top:12px">Where federal money lands, county by county. Fiscal year ${FM.FY} · data as of ${FM.ASOF} · version ${FM.VERSION || "0.4 prototype"}.</p>
-      <p class="small" style="margin-top:8px">A prototype — not yet published.</p></div>
+      <p class="small" style="margin-top:12px">Where federal money lands, county by county. Fiscal year ${FM.FY} · data as of ${FM.ASOF} · version ${FM.VERSION || "1.0"}.</p></div>
     <div class="cell s4"><p class="label">Explore</p><ul class="flinks"><li><a href="#/map">Map</a></li><li><a href="#/analytics">Analytics</a></li><li><a href="#/list">Every county</a></li><li><a href="#/compare">Compare</a></li><li><a href="#/how">Method</a></li><li><a href="#/about">About</a></li></ul></div>
     <div class="cell s4"><p class="label">Data</p><ul class="flinks"><li><a href="#/how">Sources &amp; method</a></li><li><button type="button" class="linkbtn" id="foot-dl" style="margin:0">Download all counties (CSV)</button></li><li><a href="#/how" onclick="setTimeout(()=>document.getElementById('how-version')?.scrollIntoView(),400)">Data version &amp; changes</a></li><li><span class="small">Report an error — a public issue tracker opens at launch</span></li></ul>
       <p class="small" style="margin-top:12px">Public data from USAspending.gov, IRS, U.S. Treasury and the Census Bureau.</p></div>

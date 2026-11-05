@@ -8,7 +8,7 @@ const { title, description, page, fips } = Astro.props;
 const full = title === "Federal Money Atlas" ? title : `${title} · Federal Money Atlas`;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const og = new URL("/og.png", Astro.site).href;
-const v = "0.5.2";
+const v = "1.0.0";
 // 5-year change data (public/app/years.js) is optional until FY2019–2022 are built (builds run from site/).
 const hasYears = existsSync("public/app/years.js");
 const nav = [["home", "/", "Home"], ["map", "/map/", "Map"], ["analytics", "/analytics/", "Analytics"], ["list", "/counties/", "Counties"], ["compare", "/compare/", "Compare"], ["how", "/how-it-works/", "Method"], ["about", "/about/", "About"]];
@@ -56,10 +56,9 @@ const nav = [["home", "/", "Home"], ["map", "/map/", "Map"], ["analytics", "/ana
   <div id="static"><slot /></div>
   <footer class="site-foot no-print"><div class="grid">
     <div class="cell s4"><a class="brand" href="/"><i aria-hidden="true"><b></b><b></b><b></b><b></b></i>Federal Money Atlas</a>
-      <p class="small" style="margin-top:12px">Where federal money lands, county by county. Fiscal year {META.fiscal_year} · data as of {META.data_as_of} · version {v}.</p>
-      <p class="small" style="margin-top:8px">A prototype — not yet published.</p></div>
+      <p class="small" style="margin-top:12px">Where federal money lands, county by county. Fiscal year {META.fiscal_year} · data as of {META.data_as_of} · version {v}.</p></div>
     <div class="cell s4"><p class="label">Explore</p><ul class="flinks"><li><a href="/map/">Map</a></li><li><a href="/analytics/">Analytics</a></li><li><a href="/counties/">Every county</a></li><li><a href="/compare/">Compare</a></li><li><a href="/how-it-works/">Method</a></li><li><a href="/about/">About</a></li></ul></div>
-    <div class="cell s4"><p class="label">Data</p><ul class="flinks"><li><a href="/how-it-works/">Sources &amp; method</a></li><li><button type="button" class="linkbtn" id="foot-dl" style="margin:0">Download all counties (CSV)</button></li><li><a href="/how-it-works/#how-version">Data version &amp; changes</a></li><li><span class="small">Report an error — a public issue tracker opens at launch</span></li></ul>
+    <div class="cell s4"><p class="label">Data</p><ul class="flinks"><li><a href="/how-it-works/">Sources &amp; method</a></li><li><button type="button" class="linkbtn" id="foot-dl" style="margin:0">Download all counties (CSV)</button></li><li><a href="/how-it-works/#how-version">Data version &amp; changes</a></li><li><span class="small">Report an error — a form is coming soon</span></li></ul>
       <p class="small" style="margin-top:12px">Public data from USAspending.gov, IRS, U.S. Treasury and the Census Bureau.</p></div>
   </div></footer>
   <script is:inline src="/vendor/d3.min.js"></script>
