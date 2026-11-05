@@ -409,7 +409,7 @@ Done: Phase 0, Phase 1 data fixes (need-based statewide grants, national program
 12. Phone: map options "hide" arrow sits below the tall panel; map has no zoom or state view.
 
 ## 2026-11-05 · Live + glitch fixes
-- Live (unannounced): https://federal-money-atlas.federal-money-atlas2.workers.dev — Cloudflare Worker, auto-deploys on push to GitHub main (site/wrangler.jsonc).
+- Live (unannounced): https://fedmoney.pages.dev — Cloudflare Pages project "fedmoney" (root site, build npm run build, output dist, NODE_VERSION 24), auto-deploys on push to GitHub main. Old Worker and federal-money-atlas Pages project to be deleted by Nima.
 - Two-tester review fixed: Home flashing over every page (caused jumps), Back/anchor scroll, compare reloads, slider lock, who-tab race, CT neighbor map, list "show more" on Back.
 - Left for later: map options "hide" button sits below the tall panel on phones; map has no zoom/state view; the browser's own "Transition was skipped" console notice.
 - years.js: Site.astro only loads it if site/public/app/years.js exists — after FY2019–2022 finish, run make_years.py and copy it there.
