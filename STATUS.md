@@ -389,11 +389,11 @@ First time only: `python3 -m venv .venv && .venv/bin/pip install pandas openpyxl
 Done: Phase 0, Phase 1 data fixes (need-based statewide grants, national programs line), the real site, live on Cloudflare Workers.
 
 **Before announcing the site**
-1. 5-year change charts: FY2019–2022 downloads running (2019, 2020 done) → `make_years.py` → copy years.js to site/public/app/.
-2. Name and domain: pick a final name; a custom domain costs ~$10/yr (the only non-free item), workers.dev stays free.
+1. ~~5-year change charts~~ Done 2026-11-05: FY2019–2023 live, same rules every year (need-based statewide grants, national programs removed via `national_programs.py --fy=YEAR`). Refresh: `make_years.py` then `make_site_data.py`.
+2. ~~Domain~~ Nima chose free: https://fedmoney.pages.dev. Final site name still open.
 3. Error-report channel: public GitHub issues or a form, linked from the footer.
 4. Decide indexing: keep search engines out until launch, or allow now.
-5. Remove the "prototype — not yet published" labels at launch.
+5. ~~Remove prototype labels~~ Done (version 1.0).
 
 **Accuracy still open**
 6. Cross-check Social Security against SSA's county file (save by hand from ssa.gov).
