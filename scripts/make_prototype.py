@@ -22,19 +22,20 @@ def k(v):
 
 
 FIELDS = ["ratio", "pop", "name", "st", "contracts", "grants_county", "grants_statewide", "ss",
-          "tax_income", "tax_payroll", "tax_other", "other_direct", "medicare_est", "loans_face", "flags"]
+          "tax_income", "tax_payroll", "tax_other", "other_direct", "medicare_est", "loans_face", "flags", "national"]
 rows = {}
 for _, r in df.iterrows():
     rows[r.FIPS] = [
         None if pd.isna(r[R]) else round(float(r[R]), 4), int(r["Population (2023)"]), r.County, r.State,
         k(r["Contracts $"]), k(r["Grants: tagged to county $"]),
-        k(r["Grants: statewide, shared by population (est.) $"]),
+        k(r["Grants: statewide, shared by need (est.) $"]),
         k(r["Social Security & SSI $"] + r["Social Security & SSI: statewide share $"]),
         k(r["Income tax $"]), k(r["Payroll taxes (SS, Medicare, UI) $"]),
         k((r["Corporate tax (est.) $"] or 0) + (r["Estate & excise taxes (est.) $"] or 0)),
         k(r["Not counted: other direct payments (VA, farm, Pell, housing) $"]),
         k(r["Not counted: Medicare Parts A&B (est.) $"]), k(r["Loans: face value $"]),
         "" if pd.isna(r["Flags for review"]) else r["Flags for review"],
+        k(r["Not counted: national programs booked here $"]),
     ]
 
 data = {

@@ -72,20 +72,27 @@ NO_COUNTY = []
 KEYS = ["scope", "state", "county", "category", "medicaid", "state_gov"]
 
 
-def download(name):
+def download(name, attempts=40):
+    """Download one archive file, resuming after any failure until it is complete.
+
+    curl's own --retry can start over from zero, so each attempt is a fresh curl call that
+    resumes (-C -) from the bytes already on disk, and gives up on a stalled connection
+    (under 20 KB/s for 60 s) so the next attempt can reconnect.
+    """
     path = RAW / "usaspending" / name
-    if path.exists():
-        try:
-            zipfile.ZipFile(path).close()
-            return path
-        except zipfile.BadZipFile:
-            print(f"  {name} is incomplete, resuming the download")
     path.parent.mkdir(parents=True, exist_ok=True)
-    print(f"  downloading {name} ...")
-    # curl can resume (-C -) and retry, which matters for 1-2 GB files.
-    subprocess.run(["curl", "-sS", "--fail", "--retry", "8", "--retry-delay", "15",
-                    "--retry-all-errors", "-C", "-", "-A", "federal-money-map Phase 0",
-                    "-o", str(path), USASPENDING_ARCHIVE + name], check=True)
+    url = USASPENDING_ARCHIVE + name
+    head = subprocess.run(["curl", "-sSIL", url], capture_output=True, text=True).stdout
+    sizes = [int(l.split(":")[1]) for l in head.splitlines() if l.lower().startswith("content-length:")]
+    total = sizes[-1] if sizes else None
+    for i in range(attempts):
+        have = path.stat().st_size if path.exists() else 0
+        if total and have >= total:
+            break
+        print(f"  {name}: {have / 1e6:,.0f} of {total / 1e6 if total else 0:,.0f} MB (attempt {i + 1})", flush=True)
+        subprocess.run(["curl", "-sS", "--fail", "-C", "-", "--speed-limit", "20000", "--speed-time", "60",
+                        "-A", "federal-money-map Phase 1", "-o", str(path), url])
+        time.sleep(5)
     zipfile.ZipFile(path).close()  # raises if the file is still incomplete
     return path
 

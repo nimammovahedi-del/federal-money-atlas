@@ -15,7 +15,7 @@
     const c = { fips, ratio: r[F.ratio], pop: r[F.pop], name: r[F.name], st: r[F.st],
       con: g("contracts"), gc: g("grants_county"), gs: g("grants_statewide"), ss: g("ss"),
       ti: g("tax_income"), tp: g("tax_payroll"), to: g("tax_other"), other: g("other_direct"),
-      medicare: r[F.medicare_est] == null ? null : r[F.medicare_est] * 1000, loans: g("loans_face"), flags: r[F.flags] || "" };
+      medicare: r[F.medicare_est] == null ? null : r[F.medicare_est] * 1000, loans: g("loans_face"), flags: r[F.flags] || "", national: F.national == null ? 0 : g("national") };
     c.gr = c.gc + c.gs; c.money = c.con + c.gr + c.ss; c.taxes = c.ti + c.tp + c.to;
     c.short = c.name.replace(/ (County|Parish|Borough|Census Area|City and Borough|Municipality|Planning Region)$/, "");
     FM.C[fips] = c;
@@ -84,6 +84,7 @@
   // Plain-language warning for counties whose number is driven by something unusual.
   FM.caution = c => { const f = c.flags || "";
     if (/no IRS data/.test(f)) return "The IRS reports this county's taxes together with a neighboring county, so there's no dollars-back figure.";
+    if (c.national > 0) return `${FM.money(c.national)} in nationwide health-benefit contracts (veterans' community care or TRICARE) is booked to an office here. It pays for care across the country, so it's shown separately and not counted for this county.`;
     if (/contracts dominate/.test(f)) return "Most of this is one or a few large federal contracts (for example a base, lab or shipyard) — not money paid to residents.";
     if (/negative/.test(f)) return "Some federal money was taken back this year, which pulls the number down.";
     if (/small population/.test(f)) return "Very few people live here, so one award can swing the number a lot.";

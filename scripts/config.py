@@ -47,6 +47,11 @@ SOURCES = {
         "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/cities/totals/sub-est2025_9.csv",
         RAW / "census" / "sub-est2025_9.csv",
     ),
+    # Need measures for sharing statewide grants (keyless Census files; the Census API now needs a key).
+    "acs_medicaid": ("https://www2.census.gov/programs-surveys/acs/summary_file/2023/table-based-SF/data/5YRData/acsdt5y2023-c27007.dat", RAW / "census" / "acsdt5y2023-c27007.dat"),
+    "acs_snap": ("https://www2.census.gov/programs-surveys/acs/summary_file/2023/table-based-SF/data/5YRData/acsdt5y2023-b22001.dat", RAW / "census" / "acsdt5y2023-b22001.dat"),
+    "acs_children": ("https://www2.census.gov/programs-surveys/acs/summary_file/2023/table-based-SF/data/5YRData/acsdt5y2023-b09001.dat", RAW / "census" / "acsdt5y2023-b09001.dat"),
+    "saipe_poverty": ("https://www2.census.gov/programs-surveys/saipe/datasets/2023/2023-state-and-county/est23all.txt", RAW / "census" / "saipe_est23all.txt"),
     "bea_cainc4": (
         "https://apps.bea.gov/regional/zip/CAINC4.zip",
         RAW / "bea" / "CAINC4.zip",

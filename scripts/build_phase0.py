@@ -197,6 +197,73 @@ def statewide(sp, scope="pop"):
                          aggfunc="sum").fillna(0)
 
 
+# ---------------------------------------------------------------- statewide grants by need (Phase 1)
+# Statewide grants (mostly Medicaid) have no county in USAspending. Instead of sharing them by population,
+# each program is shared by the people it serves, measured by the Census Bureau for every county.
+PROGRAM_NEED = {
+    "medicaid": ["93.778", "93.767"],                                   # Medicaid, CHIP -> people with Medicaid coverage
+    "children": ["10.555", "10.553", "10.558", "10.559", "84.010", "84.027", "84.173", "93.658", "93.659", "93.563", "93.600"],  # school meals, Title I, special ed, foster care, adoption, child support, Head Start -> children
+    "poverty": ["93.558", "93.575", "93.596", "93.568", "93.569", "93.667"],  # TANF, child care, LIHEAP, CSBG, SSBG -> people in poverty
+    "food": ["10.557", "10.561", "10.568", "10.569"],                  # WIC, SNAP administration, TEFAP -> households receiving SNAP
+}
+NEED_LABEL = {"medicaid": "people with Medicaid coverage", "children": "children under 18", "poverty": "people in poverty",
+              "food": "households receiving SNAP", "population": "population"}
+
+
+def need_measures(counties):
+    """Per-county counts used to share statewide grants: Medicaid coverage, SNAP households, children, poverty."""
+    def acs(path, cols):
+        d = pd.read_csv(path, sep="|", dtype=str, usecols=["GEO_ID", *cols])
+        d = d[d.GEO_ID.str.startswith("0500000US")]
+        d["fips"] = d.GEO_ID.str[-5:]
+        return d.set_index("fips")[cols].astype(float).sum(axis=1)
+    med = acs(src["acs_medicaid"], [f"C27007_E{n:03d}" for n in (4, 7, 10, 14, 17, 20)])
+    snap = acs(src["acs_snap"], ["B22001_E002"])
+    kids = acs(src["acs_children"], ["B09001_E001"])
+    pov = {}
+    for line in open(src["saipe_poverty"], encoding="latin-1"):
+        f = line.split()
+        if len(f) > 3 and f[1] != "0" and f[2].isdigit():
+            pov[f[0].zfill(2) + f[1].zfill(3)] = float(f[2])
+    m = counties[["fips", "state", "population"]].copy()
+    m["medicaid"], m["food"], m["children"], m["poverty"] = (m.fips.map(med), m.fips.map(snap), m.fips.map(kids), m.fips.map(pov))
+    for k in ("medicaid", "food", "children", "poverty"):   # rare gaps: fall back to population share of the state average
+        rate = m[k].sum() / m.population.sum()
+        m[k] = m[k].fillna(m.population * rate)
+    return m
+
+
+def statewide_grants_by_need(counties, sw):
+    """Share each state's no-county grants among its counties, program by program."""
+    m = need_measures(counties)
+    progs = pd.read_csv(INTERIM / f"usaspending_fy{FISCAL_YEAR}_no_county_programs.csv", dtype=str, keep_default_na=False)
+    progs["obligation"] = progs.obligation.astype(float)
+    progs = progs[(progs.category == "grants") & progs.state.isin(ABBR_TO_FIPS)]
+    code_to_group = {code: g for g, codes in PROGRAM_NEED.items() for code in codes}
+    progs["group"] = progs.program.str[:6].map(code_to_group).fillna("population")
+    by = progs.groupby(["state", "group"]).obligation.sum().unstack(fill_value=0)
+    # Match each state's total to the statewide grant total used elsewhere; any difference goes by population.
+    total = by.sum(axis=1)
+    target = pd.Series({st: (sw.loc[st, "grants"] if st in sw.index and "grants" in sw else 0) for st in m.state.unique()})
+    by = by.reindex(target.index, fill_value=0)
+    by["population"] = by.get("population", 0) + (target - total.reindex(target.index, fill_value=0))
+    out = pd.Series(0.0, index=m.index)
+    for g in by.columns:
+        measure = m[g] if g in m else m.population
+        share = measure / measure.groupby(m.state).transform("sum")
+        out += m.state.map(by[g]).fillna(0) * share
+    mix = (by.div(by.sum(axis=1), axis=0)).fillna(0)
+    return out.values, mix
+
+
+def national_programs():
+    path = REFERENCE / f"national_programs_fy{FISCAL_YEAR}.csv"
+    if not path.exists():
+        return {}
+    d = pd.read_csv(path, dtype={"fips": str})
+    return d.groupby("fips").amount.sum().to_dict()
+
+
 # ---------------------------------------------------------------- medicare
 def medicare_estimate():
     d = pd.DataFrame(json.load(open(src["cms_medicare_county"])))
@@ -234,6 +301,9 @@ def main():
     c = counties.copy()
     cat = lambda name, frame=pop_cty: c.fips.map(frame[name] if name in frame else {}).fillna(0)
     c["contracts"] = cat("contracts")
+    natl = national_programs()   # nationwide health-benefit contracts booked at one office (not counted here)
+    c["national_programs"] = c.fips.map(natl).fillna(0.0)
+    c["contracts"] = c.contracts - c.national_programs
     c["grants_county"] = cat("grants")
     c["ss_ssi"] = cat("social_security_ssi")
     c["other_direct"] = cat("other_direct_payments")
@@ -247,9 +317,9 @@ def main():
     # Share statewide (no-county) grants and Social Security by population.
     state_pop_sum = c.groupby("state").population.transform("sum")
     pop_share = c.population / state_pop_sum
-    for col, catname in (("grants_statewide", "grants"), ("ss_ssi_statewide", "social_security_ssi")):
-        amt = c.state.map(sw[catname] if catname in sw else {}).fillna(0)
-        c[col] = amt * pop_share
+    c["grants_statewide"], need_mix = statewide_grants_by_need(c, sw)
+    amt = c.state.map(sw["social_security_ssi"] if "social_security_ssi" in sw else {}).fillna(0)
+    c["ss_ssi_statewide"] = amt * pop_share
 
     c = c.merge(taxes.drop(columns=["population"]), on="fips", how="left")
     c["medicare_est"] = c.fips.map(medicare)
@@ -270,6 +340,8 @@ def main():
     # Flags a reviewer should see.
     def flags(r):
         f = []
+        if r.national_programs > 0:
+            f.append(f"national program contracts booked here moved out of contracts (${r.national_programs / 1e9:,.1f}B)")
         if r.fips in remap_notes:
             f += sorted(remap_notes[r.fips])
         if r.population < 5000:
@@ -386,7 +458,7 @@ def main():
 COUNTY_COLUMNS = [
     ("fips", "FIPS"), ("state", "State"), ("county", "County"), ("population", "Population (2023)"),
     ("contracts", "Contracts $"), ("grants_county", "Grants: tagged to county $"),
-    ("grants_statewide", "Grants: statewide, shared by population (est.) $"),
+    ("grants_statewide", "Grants: statewide, shared by need (est.) $"),
     ("ss_ssi", "Social Security & SSI $"), ("ss_ssi_statewide", "Social Security & SSI: statewide share $"),
     ("money_in", "MONEY IN (counted) $"), ("money_in_per_person", "Money in per person $"),
     ("tax_income", "Income tax $"), ("tax_payroll", "Payroll taxes (SS, Medicare, UI) $"),
@@ -404,6 +476,7 @@ COUNTY_COLUMNS = [
     ("dollars_back_broad", "Dollars back per $1 (broad, incl. not-counted items)"),
     ("contracts_recipient", "Contracts by recipient's location $"),
     ("grants_recipient", "Grants by recipient's location $"),
+    ("national_programs", "Not counted: national programs booked here $"),
     ("flags", "Flags for review"),
 ]
 
@@ -483,9 +556,11 @@ README_LINES = [
     "",
     "MONEY IN (counted) = contracts + grants + Social Security & SSI, by where the work or payment happens.",
     "  Grants with no county (mostly statewide programs such as Medicaid) are shared among a state's",
-    "  counties by population. Those columns say 'est.'. Nationally only about 24% of grant dollars",
-    "  carry a county, so for most counties the grant line is mostly this estimate (Medicaid is the",
-    "  biggest piece). Phase 1 should share each big program by a better measure (e.g. enrollment).",
+    "  counties by need: Medicaid by people with Medicaid coverage, school and child programs by children,",
+    "  TANF/child care/energy aid by people in poverty, WIC and SNAP administration by SNAP households,",
+    "  everything else by population (Census ACS 2019-2023 and SAIPE 2023). Those columns say 'est.'.",
+    "  Nationwide health-benefit contracts (VA community care, TRICARE) are moved out of the county",
+    "  where they're booked into a 'national programs' column that is not counted.",
     "  These are obligations: money agencies committed that year (USAspending's standard measure).",
     "TAXES PAID (est.) = federal taxes tied to residents: income tax and payroll taxes from IRS county",
     "  data, plus corporate tax (75% by investment income, 25% by wages), estate tax (by investment",

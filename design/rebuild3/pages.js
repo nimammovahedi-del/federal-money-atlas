@@ -4,7 +4,7 @@
   const V3 = (window.V3 = {});
   const R = FM.r2, M = FM.money, ALL = FM.ALL, OK = ALL.filter(FM.hasRatio);
   const MOB = matchMedia("(max-width: 760px)").matches;   // phones get narrower charts so labels stay readable
-  FM.VERSION = "0.4 prototype"; FM.DATA_NOTE = "USAspending bulk files of Oct 6, 2026 (FY2023); IRS SOI county data, tax year 2023; Census Vintage 2025; Treasury MTS FY2023";
+  FM.VERSION = "0.5 prototype"; FM.DATA_NOTE = "USAspending bulk files of Oct 6, 2026 (FY2023); IRS SOI county data, tax year 2023; Census Vintage 2025 and ACS 2019–2023; Treasury MTS FY2023";
   const sum = (l, f) => l.reduce((a, c) => a + (f(c) || 0), 0);
   const esc = FM.esc;
 
@@ -314,7 +314,8 @@
       <div><span class="label">Money in</span><b style="color:var(--ink)">${M(T.money)}</b></div><span class="op">÷</span><div><span class="label">Taxes paid</span><b>${M(T.tax)}</b></div><span class="op">=</span><div class="res"><span class="label">Back per $1 · U.S.</span><b>${R(FM.US)}</b></div></div></div>
     <div class="grid">
       <div class="cell s4"><p class="step">1</p><h2 class="t">Money in</h2><p class="small" style="margin-top:8px">Every federal <b>contract, grant and Social Security &amp; SSI payment</b> committed in fiscal year 2023 (Oct 2022–Sep 2023), credited to the county <b>where the work or payment happens</b> — not where the company or agency is based. We count the main award only, never the sub-awards inside it, so nothing is counted twice.</p>
-        <p class="small" style="margin-top:8px">About three-quarters of grant dollars (mostly Medicaid) go to states with no county attached. Each county gets a <b>population share</b> of those, marked “est.”</p></div>
+        <p class="small" style="margin-top:8px">About three-quarters of grant dollars (mostly Medicaid) go to states with no county attached. Each county gets a share <b>based on the people each program serves</b>: Medicaid by residents with Medicaid coverage, school and child programs by children, TANF and child care by people in poverty, food programs by households on SNAP, the rest by population (Census Bureau). These are marked “est.”</p>
+        <p class="small" style="margin-top:8px">Four nationwide health-benefit contracts — veterans' community care and TRICARE, ${M(sum(ALL, c => c.national))} in all — are booked to the contractor's office county. They're shown separately as “national programs” and not counted for that county.</p></div>
       <div class="cell s4"><p class="step">2</p><h2 class="t">Taxes paid</h2><p class="small" style="margin-top:8px">We start from the U.S. Treasury's fiscal 2023 total ($4.44 trillion) and share 97% of it out to counties:</p>
         <ul class="small bul"><li><b>Income tax</b> — by each county's share in IRS county data (measured).</li><li><b>Payroll taxes</b> — by an estimate of each county's taxable wages, with the Social Security wage cap applied.</li><li><b>Corporate tax</b> — 75% by investment income, 25% by wages.</li><li><b>Estate tax</b> by investment income; <b>excise taxes</b> by population.</li><li><b>Customs and other receipts</b> (2.7%) aren't assigned to any county.</li></ul></div>
       <div class="cell s4"><p class="step">3</p><h2 class="t">Divide</h2><p class="small" style="margin-top:8px">Money in ÷ taxes paid = <b>dollars back per $1</b>. We compare each county with the <b>typical county</b> (${R(FM.MED)}), the one in the middle. The <b>U.S. overall</b> figure (${R(FM.US)}) adds everything up, so a few high-tax places weigh heavily on it.</p>
@@ -336,14 +337,15 @@
         <li><b>±8%</b>Every state's taxes vs. the Rockefeller Institute's estimates (0.6% overall)</li><li><b>0.97</b>Correlation of our state results with Rockefeller's</li></ul></div>
       <div class="cell s6"><p class="label">Limits to keep in mind</p><ul class="small bul">
         <li>Money is what agencies <b>committed</b> that year; large contracts can land in one year for several years of work.</li>
-        <li>Some national programs are booked at one office (for example, veterans' community-care contracts in Spotsylvania County, VA).</li>
-        <li>Statewide grants are shared by population, not by who actually uses them — a better method is planned.</li>
+        <li>Statewide grants are shared by the people each program serves, measured by the Census Bureau — an estimate, not actual payments per county.</li>
+        <li>Other nationally run contracts may still be booked at one office; counties where contracts dominate are flagged.</li>
         <li>Taxes other than income tax are estimates. Connecticut reports 9 planning regions instead of counties.</li></ul></div>
     </div>
     <div class="grid"><div class="cell s6 white" id="how-version"><p class="label">Data version</p><h2 class="t">Version ${FM.VERSION}</h2>
         <p class="small" style="margin-top:8px">${FM.DATA_NOTE}. Agencies correct past spending every month, so each release keeps its version number and date; cite the version you used.</p>
         <p class="small" style="margin-top:8px">${FM.int(FM.ALL.length)} counties and county-equivalents; ${FM.int(FM.N)} have a dollars-back figure (Kalawao, HI is reported by the IRS together with Maui).</p></div>
       <div class="cell s6"><p class="label">Changes</p><ul class="checks changes">
+        <li><b>0.5</b>Statewide grants shared by need (Medicaid coverage, children, poverty, SNAP); nationwide health-benefit contracts moved to their own line · Nov 5, 2026</li>
         <li><b>0.4</b>Who got the money (live from USAspending), citations, footer, phone layout · Nov 5, 2026</li>
         <li><b>0.3</b>Analytics page, method page, map filters by population and dollars back · Nov 5, 2026</li>
         <li><b>0.2</b>Plain notes for outlier counties; one number format; search by state · Nov 4, 2026</li>

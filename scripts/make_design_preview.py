@@ -28,11 +28,11 @@ states = sorted(([s, round(v[M] / v[T], 3), int(v["Population (2023)"])] for s, 
 def detail(fips):
     r = df[df.FIPS == fips].iloc[0]
     ss = r["Social Security & SSI $"] + r["Social Security & SSI: statewide share $"]
-    grants = r["Grants: tagged to county $"] + r["Grants: statewide, shared by population (est.) $"]
+    grants = r["Grants: tagged to county $"] + r["Grants: statewide, shared by need (est.) $"]
     return {
         "fips": fips, "county": r.County, "state": r.State, "population": int(r["Population (2023)"]),
         "contracts": r["Contracts $"], "grants_county": r["Grants: tagged to county $"],
-        "grants_statewide": r["Grants: statewide, shared by population (est.) $"], "grants": grants,
+        "grants_statewide": r["Grants: statewide, shared by need (est.) $"], "grants": grants,
         "ss_ssi": ss, "money_in": r[M], "money_in_pp": r["Money in per person $"],
         "tax_income": r["Income tax $"], "tax_payroll": r["Payroll taxes (SS, Medicare, UI) $"],
         "tax_other": r["Corporate tax (est.) $"] + r["Estate & excise taxes (est.) $"],
