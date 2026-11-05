@@ -8,7 +8,7 @@ const { title, description, page, fips } = Astro.props;
 const full = title === "Federal Money Atlas" ? title : `${title} · Federal Money Atlas`;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const og = new URL("/og.png", Astro.site).href;
-const v = "1.0.0";
+const v = "1.0.1";
 // 5-year change data (public/app/years.js) is optional until FY2019–2022 are built (builds run from site/).
 const hasYears = existsSync("public/app/years.js");
 const nav = [["home", "/", "Home"], ["map", "/map/", "Map"], ["analytics", "/analytics/", "Analytics"], ["list", "/counties/", "Counties"], ["compare", "/compare/", "Compare"], ["how", "/how-it-works/", "Method"], ["about", "/about/", "About"]];

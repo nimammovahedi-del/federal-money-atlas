@@ -36,7 +36,7 @@
     const P = 28, max = Math.max(...hist), bw = (W - P * 2) / hist.length;
     const x = v => { let i = BINS.findIndex((b, j) => v >= b && v < BINS[j + 1]); const lo = BINS[i], hi = BINS[i + 1] === Infinity ? 4 : BINS[i + 1]; return P + bw * (i + (v - lo) / (hi - lo)); };
     const bars = hist.map((n, i) => { const bh = (h - 62) * n / max, X = P + i * bw;
-      return `<rect x="${X + 3}" y="${h - 30 - bh}" width="${bw - 6}" height="${bh}" fill="${BINS[i] >= 1 ? "#51DA4C" : "#C9C9C9"}"/><text x="${X + bw / 2}" y="${h - 36 - bh}" text-anchor="middle" class="cv">${n}</text><text x="${X + bw / 2}" y="${h - 12}" text-anchor="middle" class="cl">${binLab(i)}</text>`; }).join("");
+      return `<rect x="${X + 3}" y="${h - 30 - bh}" width="${bw - 6}" height="${bh}" fill="${BINS[i] >= 1 ? "#51DA4C" : "#C9C9C9"}"/><text x="${X + bw / 2}" y="${h - 36 - bh}" text-anchor="middle" class="cv">${n}</text><text x="${X + bw / 2}" y="${h - 12}" text-anchor="middle" class="cl">${MOB ? (BINS[i + 1] === Infinity ? "$3+" : R(BINS[i]).replace(".00", "")) : binLab(i)}</text>`; }).join("");
     const mark = (v, lab, left) => `<line x1="${x(v)}" x2="${x(v)}" y1="4" y2="${h - 30}" stroke="#0A0A0A" stroke-width="1.5" stroke-dasharray="${left ? "4 3" : "0"}"/><text x="${x(v) + (left ? -6 : 6)}" y="12" text-anchor="${left ? "end" : "start"}" class="cm">${lab}</text>`;
     return `<figure class="chart"><svg viewBox="0 0 ${W} ${h}" role="img" aria-label="Bar chart: number of counties by dollars back per $1. ${above1} of ${OK.length} counties get $1 or more back.">${bars}${mark(FM.MED, "typical county " + R(FM.MED), false)}${mark(FM.US, "U.S. overall " + R(FM.US), true)}</svg>
       <figcaption>Counties by dollars back per $1 of federal tax. Green bars: $1 or more.</figcaption>${table("Counties by dollars back per $1", ["Back per $1", "Counties"], hist.map((n, i) => [binLab(i), FM.int(n)]))}</figure>`;
@@ -106,7 +106,7 @@
   // Per-person scatter: taxes paid per person (x) vs money in per person (y), log scales, $1-per-$1 line.
   function scatter(h = 380) {
     const W = MOB ? 380 : 640; if (MOB) h = 340;
-    const P = 46, pts = OK.filter(c => c.money > 0 && c.taxes > 0).map(c => ({ c, x: c.taxes / c.pop, y: c.money / c.pop }));
+    const P = MOB ? 62 : 46, pts = OK.filter(c => c.money > 0 && c.taxes > 0).map(c => ({ c, x: c.taxes / c.pop, y: c.money / c.pop }));
     const lx = d3.scaleLog([1500, 150000], [P, W - 14]).clamp(true), ly = d3.scaleLog([1500, 150000], [h - P, 10]).clamp(true);
     const ticks = [2000, 5000, 10000, 20000, 50000, 100000], k = v => "$" + (v >= 1000 ? v / 1000 + "K" : v);
     const grid = ticks.map(t => `<line x1="${lx(t)}" x2="${lx(t)}" y1="10" y2="${h - P}" stroke="#E5E5E5"/><text x="${lx(t)}" y="${h - P + 16}" text-anchor="middle" class="cl">${k(t)}</text>
@@ -239,9 +239,9 @@
         <div class="bigfact"><span class="giant">${N50}</span><span>counties received <b>half of all federal contract dollars</b> (${M(T.con / 2)} of ${M(T.con)}). The other half was spread across ${FM.int(byCon.length - N50)}.</span></div></div>
     </div>
     <div class="grid phone-hide">
-      <div class="cell s4"><p class="label">Change over time</p><h2 class="t">Five years of federal money</h2><div id="home-change">${changeChart(200)}</div></div>
-      <div class="cell s4"><p class="label">Most back per $1 · 10,000+ residents</p><h2 class="t">Bases, labs and shipyards</h2>${extremeList(top.slice(0, 4))}</div>
-      <div class="cell s4"><p class="label">Least back per $1 · 10,000+ residents</p><h2 class="t">High-income suburbs and resorts</h2>${extremeList(bottom.slice(0, 4))}</div>
+      <div class="cell s4"><h2 class="t">Five years of federal money</h2><div id="home-change">${changeChart(200)}</div></div>
+      <div class="cell s4"><h2 class="t">Most back per $1: bases, labs and shipyards</h2>${extremeList(top.slice(0, 4))}</div>
+      <div class="cell s4"><h2 class="t">Least back per $1: high-income suburbs and resorts</h2>${extremeList(bottom.slice(0, 4))}</div>
     </div>
     <div class="grid">
       <a class="cell s4 cta green" href="#/analytics"><span class="label" style="color:var(--ink)">Analytics</span><span class="ctat">See every chart →</span></a>
@@ -382,6 +382,40 @@
     </div>
     <div class="grid"><div class="cell s8 white"><p class="label">Status</p><h2 class="t">Fiscal year 2023 data</h2><p class="small" style="margin-top:8px">Numbers come from public data for fiscal year 2023; five-year change (2019–2023) is being added. See <a href="#/how">how it works</a> for the full method and its limits.</p></div>
       <a class="cell s4 cta green" href="#/"><span class="label" style="color:var(--ink)">Start</span><span class="ctat">Find your county →</span></a></div>`;
+  };
+
+  // ---------- Tidy pass (applies to Home, Analytics, Method, About)
+  // - Eyebrows: only the page-top one stays; small labels sitting above a heading are removed (labels that name
+  //   a number or a list stay, since they say what it is). Step counters go too.
+  // - Subtext: explanation paragraphs in each tile fold into one "More" toggle; "Reading it" notes on Analytics
+  //   move under their chart as "What this shows".
+  const fold = (nodes, label) => { if (!nodes.length) return; const d = document.createElement("details"); d.className = "more";
+    d.innerHTML = `<summary>${label}</summary>`; nodes[0].before(d); nodes.forEach(n => d.appendChild(n)); };
+  const isHead = n => n && /^H[1-3]$/.test(n.tagName);
+  V3.tidy = view => {
+    const grids = [...view.querySelectorAll(".grid")], top = grids[0];
+    view.querySelectorAll("p.label").forEach(l => { if (top && top.contains(l)) return;
+      const n = l.nextElementSibling; if (!l.textContent.trim() || isHead(n) || (n && isHead(n.firstElementChild))) l.remove(); });
+    view.querySelectorAll(".step").forEach(s => { if (!top || !top.contains(s)) s.remove(); });
+    // Analytics "Reading it" tiles → under the chart next to them
+    view.querySelectorAll(".cell").forEach(c => { const l = c.firstElementChild; if (!l || !l.matches("p.label") || l.textContent.trim() !== "Reading it") return;
+      const chart = c.previousElementSibling; l.remove(); const kids = [...c.children]; if (!chart) return;
+      chart.append(...kids); fold(kids, "What this shows"); chart.className = chart.className.replace(/\bs\d+\b/, "s12") + " solo"; c.remove(); });
+    view.querySelectorAll(".cell").forEach(c => { if (top && top.contains(c)) return;
+      const prose = [...c.children].filter(n => n.matches("p.small, p.lead") && !n.closest("details")); fold(prose, "More"); });
+  };
+
+  // Analytics on phones: each section is a row that opens on tap (open on wider screens).
+  V3.sections = el => {
+    const phone = matchMedia("(max-width: 760px)"), grids = [...el.querySelectorAll(":scope > .grid")].slice(1);
+    const names = Object.fromEntries([...el.querySelectorAll(".toc [data-jump]")].map(b => [b.dataset.jump, b.textContent]));
+    let cur = null; const secs = [];
+    grids.forEach(g => { const a = g.querySelector('[id^="an-"]');
+      if (a && names[a.id]) { cur = document.createElement("details"); cur.className = "an-sec"; cur.dataset.sec = a.id;
+        cur.innerHTML = `<summary>${names[a.id]}</summary>`; g.before(cur); secs.push(cur); }
+      if (cur) cur.appendChild(g); });
+    const set = () => secs.forEach(d => d.open = !phone.matches); set(); phone.addEventListener("change", set);
+    el.querySelectorAll("[data-jump]").forEach(b => b.addEventListener("click", () => { const t = document.getElementById(b.dataset.jump), d = t && t.closest("details.an-sec"); if (d) d.open = true; }, true));
   };
 
   // re-render change charts once years.js arrives (or on show)

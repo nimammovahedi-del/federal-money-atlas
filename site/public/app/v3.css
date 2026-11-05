@@ -364,3 +364,22 @@ nav.main .short{display:none}
   .chart .cl,.chart .cv{font-size:12.5px}.chart .cm{font-size:13px}
   .chart figcaption{font-size:13px}
 }
+
+/* ---------- tidy pass: "More" toggles and phone section rows */
+details.more{margin-top:12px}
+details.more>summary{display:inline-flex;align-items:center;gap:6px;cursor:pointer;list-style:none;font:600 13px var(--sans);color:var(--mute);padding:4px 0}
+details.more>summary::-webkit-details-marker,details.an-sec>summary::-webkit-details-marker{display:none}
+details.more>summary::after{content:"+";font:600 15px var(--mono);line-height:1}
+details.more[open]>summary::after{content:"−"}
+details.more>summary:hover{color:var(--ink)}
+details.more>*:not(summary){margin-top:8px}
+.cell.solo .chart svg{max-width:760px}
+details.an-sec>summary{display:none}
+@media (max-width:760px){
+  #v-analytics .toc{display:none}
+  details.an-sec>summary{display:flex;justify-content:space-between;align-items:center;cursor:pointer;list-style:none;
+    padding:18px 16px;border-top:1px solid var(--line,#E2E2E2);font:700 18px var(--sans);letter-spacing:-.01em;background:#fff}
+  details.an-sec>summary::after{content:"+";font:600 20px var(--mono)}
+  details.an-sec[open]>summary::after{content:"−"}
+  details.an-sec:last-of-type{border-bottom:1px solid var(--line,#E2E2E2)}
+}

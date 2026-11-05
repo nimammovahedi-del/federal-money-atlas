@@ -281,6 +281,8 @@
   window.V3.analytics($("#v-analytics"), pat);
   window.V3.how($("#v-how"), pat);
   window.V3.about($("#v-about"), pat);
+  ["#v-home", "#v-analytics", "#v-how", "#v-about"].forEach(s => window.V3.tidy($(s)));
+  window.V3.sections($("#v-analytics"));
 
   // ---------- start
   const routes = { county, list, compare, map: () => { if (phone.matches) setDrawer(false); mapUpdate(); setTimeout(() => $("#map-title").focus({ preventScroll: true }), 0); }, analytics: () => window.V3.onShow("analytics"), home: () => window.V3.onShow("home") };
