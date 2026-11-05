@@ -384,21 +384,29 @@ cd ~/Projects/federal-money-map/scripts
 ```
 First time only: `python3 -m venv .venv && .venv/bin/pip install pandas openpyxl pypdf` in the project folder.
 
-## Next steps
+## Next steps (updated 2026-11-05)
 
-1. **You:** review the spreadsheet and pick a design direction (A, B, C or a mix). Pick a name, or let me check a shortlist for conflicts.
-2. **Phase 1 accuracy work (before any public page):**
-   - Share statewide programs by a real measure instead of population: Medicaid and CHIP by county enrollment (Census ACS Medicaid coverage), SNAP by participating households (ACS), school meals by enrolled students. The data sources still need checking.
-   - Add a "national programs" bucket for contracts booked at one place but spent nationwide (VA Community Care, TRICARE managed care, Medicare contractors). Detect them by program and contract type.
-   - 5-year history (FY2019–FY2023) and 5-year averages. That's another 5 × ~3.3 GB of downloads, one year at a time, each deleted after reading. The script already supports this pattern; I'll ask before downloading.
-   - Who got it: top recipients per county, grouped by parent UEI.
-   - New awards and cancellations: from the monthly "delta" files, using modification type codes (terminations, deobligations).
-   - Cross-check Social Security against SSA's county file. Save it by hand from ssa.gov, since the site blocks scripts.
-   - Verify the 82.5% Social Security taxable-wage share against SSA's Annual Statistical Supplement.
-3. **Phase 2 website:** Astro static site with county pages pre-built from the data. Free hosting on a **new** Cloudflare or Vercel account you'll create when we get there. A monthly GitHub Actions job rebuilds the data (fits the free runner's disk if files are processed one at a time).
-4. Later: congressional districts, estimated by combining county pieces.
+Done: Phase 0, Phase 1 data fixes (need-based statewide grants, national programs line), the real site, live on Cloudflare Workers.
 
-Not done yet: nothing is committed to git (the repo is initialized with a .gitignore that keeps the big raw files out), nothing is published, and no accounts were created.
+**Before announcing the site**
+1. 5-year change charts: FY2019–2022 downloads running (2019, 2020 done) → `make_years.py` → copy years.js to site/public/app/.
+2. Name and domain: pick a final name; a custom domain costs ~$10/yr (the only non-free item), workers.dev stays free.
+3. Error-report channel: public GitHub issues or a form, linked from the footer.
+4. Decide indexing: keep search engines out until launch, or allow now.
+5. Remove the "prototype — not yet published" labels at launch.
+
+**Accuracy still open**
+6. Cross-check Social Security against SSA's county file (save by hand from ssa.gov).
+7. Verify the 82.5% taxable-wage share against SSA's Annual Statistical Supplement.
+8. Group "who got the money" recipients by parent company (now: live USAspending top 10).
+
+**Features from the brief not built yet**
+9. New awards and cancellations feed (monthly USAspending delta files; terminations, deobligations).
+10. Monthly automatic data refresh (free GitHub Actions job → push → auto-deploy).
+11. Congressional districts (estimated from county pieces).
+
+**Small polish**
+12. Phone: map options "hide" arrow sits below the tall panel; map has no zoom or state view.
 
 ## 2026-11-05 · Live + glitch fixes
 - Live (unannounced): https://federal-money-atlas.federal-money-atlas2.workers.dev — Cloudflare Worker, auto-deploys on push to GitHub main (site/wrangler.jsonc).
